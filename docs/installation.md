@@ -1,8 +1,16 @@
 # Installation and compatibility
 
-The tested route installs the entire skill folder into a project's `.agents/skills` directory. The model and any tools are supplied by Codex; the skill needs no API key or server of its own.
+For the visual learning experience shown in this repository, use **ChatGPT Chat mode** with lucid-reason available in your account or workspace. The same instruction files can also be installed into a Codex project's `.agents/skills` directory for local use and reproducible text evaluation. The skill itself needs no API key or server.
 
-## From source
+## ChatGPT Chat mode
+
+If your account or workspace has access to lucid-reason, open a Chat conversation, type `@`, and select the plugin or its skill. Ask a natural-language question such as `lr 系统讲解 Transformer`. Explicit selection clarifies the intended skill; `lr` alone is a natural-language hint whose automatic activation depends on the host.
+
+The [real shared conversation](../examples/README.md) demonstrates ChatGPT's native display of the answer, mathematics, diagrams, and a chart. Rendering and interactive tools come from the host. A public shared page may display a different set of features from the original signed-in conversation.
+
+This repository and its release ZIP provide open-source plugin/skill files. They do not automatically install a plugin into a ChatGPT account or create a public catalog listing. Where custom plugin creation or import is available, use that account or workspace's supported authoring workflow with the complete `plugin.json` and `skills/` package. Follow OpenAI's [skill authoring and invocation documentation](https://learn.chatgpt.com/docs/build-skills); import availability is controlled by the host.
+
+## Codex: from source
 
 Requirements: Git, Python 3.10+, and an installed Codex host. The installer uses only the Python standard library.
 
@@ -55,7 +63,8 @@ Extract the ZIP. For local skill installation, copy the complete `skills/systema
 | Codex CLI 0.160.0 project skill loading | Actual evaluation uses a fresh `.agents/skills` directory and an explicit selector; tool traces record observed reads. See the runtime report. |
 | Codex CLI native multi-turn continuation | Evaluated with actual session continuation, not reconstructed conversations. |
 | Natural-language `lr` implicit activation | Not measured; selection is controlled explicitly for reproducibility. |
-| ChatGPT / Codex desktop marketplace import | Not run. Included manifests are packaging compatibility, not proof of UI installation. |
+| ChatGPT public shared-page rendering | Real Transformer conversation captured with native formulas, diagrams, and a chart. Original model/skill version unspecified; no parameter-control interaction tested. See the presentation provenance. |
+| ChatGPT / Codex desktop marketplace import | Not run. Included manifests and a shared conversation are not proof of a fresh marketplace installation. |
 | Windows / macOS installation | Not run in the recorded environment. |
 
 The plugin's display name is lucid-reason. Existing identifiers remain `systematic-knowledge-architect` (plugin) and `systematic-knowledge-construction` (skill), so existing references remain usable.

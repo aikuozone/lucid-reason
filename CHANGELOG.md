@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — documentation
+
+- Put the ChatGPT Chat experience first in both project introductions, using the author's supplied description.
+- Replace the main CLI-card preview with a real public Transformer conversation, a complete native-page screenshot, and five focused page views.
+- Add screenshot capture tooling and provenance; retain CLI examples and evaluation records separately.
+- Clarify host-provided visualization, plugin availability, and the limits of screenshot evidence. Runtime instructions and the v1.1.4 package are unchanged.
+
 ## 1.1.4 — 2026-10-20
 
 - Publish the instruction-only plugin as an MIT-licensed source repository.

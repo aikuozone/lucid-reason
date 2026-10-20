@@ -1,0 +1,64 @@
+{
+  "source_url": "https://chatgpt.com/share/6ad6bc80-00d0-83e8-a6c7-f83d75adaf68",
+  "page_title": "系统讲解 Transformer",
+  "captured_at_utc": "2026-10-20T01:46:25.171048+00:00",
+  "source_kind": "User-provided public ChatGPT shared conversation",
+  "original_model": "Not exposed by the public page",
+  "original_skill_version": "Not exposed by the public page",
+  "prompt": "lr 系统讲解 transformer",
+  "message_count": 2,
+  "message_text_sha256": "95dcd332c7934e76ecf4a144eb7b4041dd1352913efbc54adca48085d3be79eb",
+  "playwright_version": "1.48.0",
+  "browser_version": "130.0.6723.31",
+  "preview_viewport": {
+    "width": 1440,
+    "height": 1100
+  },
+  "full_viewport": {
+    "width": 1440,
+    "height": 29467
+  },
+  "device_scale_factor": 1,
+  "preview_scroll_offsets": {
+    "knowledge-map.png": 1245,
+    "attention.png": 8496,
+    "architecture.png": 17864,
+    "complexity.png": 23399
+  },
+  "rendered_inventory": {
+    "messages": 1,
+    "characters": 17527,
+    "tables": 7,
+    "svgElements": 54,
+    "rangeInputs": 0,
+    "chartOptionButtons": 1
+  },
+  "capture_method": "Native browser screenshots. Full capture enlarges viewport height only; no CSS, message, diagram, or UI replacement; no stitching.",
+  "interaction_validation": "Static rendering only; no parameter changes or interactive behavior asserted.",
+  "images": {
+    "architecture.png": {
+      "bytes": 165234,
+      "sha256": "82d8e3e8d1c8f1181635e6dbfd1a348ef8ddd667984b2342b84ad07477683a2e"
+    },
+    "attention.png": {
+      "bytes": 150912,
+      "sha256": "f5af97927620671b3d9e6726c7c0b39fc7e67e4e92ca4c0421b9417ead965276"
+    },
+    "complexity.png": {
+      "bytes": 139836,
+      "sha256": "8e570282c51e35e7acb7864344fa39fcd659ae9612929ea711ed246c4e06df7d"
+    },
+    "full.png": {
+      "bytes": 4070123,
+      "sha256": "fec0a9a7aac85866bd76efa8e90e9634be73ad39e4dcd7231c15a54b91b29bdc"
+    },
+    "knowledge-map.png": {
+      "bytes": 203880,
+      "sha256": "ba1b79634b88a972861455b54bf58c3e2add75383180d569f5ed8522199b3e21"
+    },
+    "opening.png": {
+      "bytes": 234984,
+      "sha256": "805c3c8dda5dfd9d928f21987393936084c4d99e1e81e745ff7361859e0d95d5"
+    }
+  }
+}

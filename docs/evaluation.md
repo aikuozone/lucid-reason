@@ -6,6 +6,8 @@ The repository separates three kinds of evidence:
 2. **Actual conversations:** native Codex runs in isolated workspaces, preserving full task inputs and final responses. Fixture checks verify real local edits.
 3. **Response assessment:** criterion-based, explicitly identified model-assisted judgments and a documented publisher spot review. A model judge is not an independent human study.
 
+The [native ChatGPT showcase](../examples/README.md) is separate presentation evidence: a real user-provided public conversation captured in its original shared-page renderer. It demonstrates the displayed text, formulas, diagrams, and chart. It does not supply a controlled baseline, identify the original model/skill version, validate fresh plugin installation, or test parameter-control interactivity. Its [capture provenance](presentation.md) records exactly what was rendered. CLI evaluation results do not establish ChatGPT frontend behavior.
+
 ## Scenario inventory
 
 [scenarios.json](../evals/scenarios.json) contains ten core scenarios and six decision-calibration scenarios derived from the existing v1.1.3 acceptance specification. It also contains six new transfer cases: untrusted retrieved instructions, unsupported private results, a short explanation, an English diagnosis, average concurrency versus peak capacity, and simulated versus real achievements.
