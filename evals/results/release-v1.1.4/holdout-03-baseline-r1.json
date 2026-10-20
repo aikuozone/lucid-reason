@@ -1,0 +1,33 @@
+{
+  "scenario": "holdout-03",
+  "title": "简短回答保持完整",
+  "group": "holdout",
+  "variant": "baseline",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-20T00:48:50.595421+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n用不超过 180 个汉字解释“相关不等于因果”，必须包含一个例子和一个帮助识别因果的办法。",
+      "response": "“相关不等于因果”指两件事同时变化，不代表一件导致另一件。例如，冰淇淋销量越高，溺水人数也越多，但两者可能都受炎热天气影响。识别因果的一个办法是做随机对照实验：随机分组，只改变待研究因素，比较结果，以减少其他因素的干扰。",
+      "exit_code": 0,
+      "elapsed_seconds": 8.188,
+      "usage": {
+        "input_tokens": 13074,
+        "cached_input_tokens": 11392,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 107,
+        "reasoning_output_tokens": 18
+      },
+      "tool_trace": []
+    }
+  ],
+  "artifact_checks": [],
+  "skill_load_observed": false,
+  "installed_skill_files_sha256": {},
+  "artifacts": {},
+  "completed_at": "2026-10-20T00:48:58.783959+00:00"
+}

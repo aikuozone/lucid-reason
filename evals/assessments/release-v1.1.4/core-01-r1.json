@@ -1,0 +1,67 @@
+{
+  "scenario": "core-01",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "2daf9df1c427cad7ebf1850380ccdb65c40e697ce7277921b82ba2845f785fd4",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "baseline",
+    "Y": "lr"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "说明收集类型注解、默认值及 Field 约束生成 core schema，并在构造或 model_validate 时校验；User(age=\"18\") 展示字符串转换为整数。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "正常输入为 age=\"18\"，非法输入为 age=\"abc\"；捕获 ValidationError，并展示含 loc、type、msg、input 的结构化错误。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "展示 model_dump() 的字典输出和 model_dump_json() 的 JSON 字符串输出；明确校验不能证明年龄真实、用户存在或拥有权限，序列化不会自动脱敏或过滤权限。"
+          }
+        ],
+        "note": "完整覆盖任务，并说明严格模式、默认赋值不校验及 model_construct() 绕过校验等边界。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "说明类创建时收集字段规则，生成 core schema、校验器和序列化器；model_validate 接收 age=\"18\" 后得到 int 类型的 18。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "提供正常输入 age=\"18\"，以及转换后违反 ge=0 的非法输入 age=\"-1\"；捕获 ValidationError，展示字段位置、greater_than_equal 错误类别和原因。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "展示 model_dump() 和 model_dump_json()，说明 Python 字典与 JSON 字符串的区别；明确年龄约束不能证明身份、权限或数据库记录存在。"
+          }
+        ],
+        "note": "完整覆盖任务；额外说明默认值、额外字段和内部可变对象等边界，内容略多。未实测的声明不作为加分依据。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答均准确满足全部标准，示例与解释相互一致。非法输入分别展示解析失败与范围约束失败，均符合要求；补充内容的差别不足以形成实质优劣。"
+  },
+  "usage": {
+    "input_tokens": 14952,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 625,
+    "reasoning_output_tokens": 46
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

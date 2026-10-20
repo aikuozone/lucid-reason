@@ -1,0 +1,67 @@
+{
+  "scenario": "core-04",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "8a7559f1865f77659e1eb5b962fa75d9d34fe3f48e2ab07a0ba30da8f19b4f8f",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "给出文本→分词→嵌入与位置信息→多层注意力/前馈块→最终归一化→词表投影→概率分布的完整链路；用 Pre-LN 公式说明残差连接，并解释注意力跨位置聚合、FFN 逐位置加工的联系。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "明确写出 softmax(QK^T/√d_k+M)V，说明 softmax 沿键位置进行及缩放原因；列出 Q、K、V 和分数、输出的维度约束，给出多头维度及禁止读取未来的因果 mask。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "通过错位输入与目标、teacher forcing 和因果遮罩解释训练的位置并行，通过逐 token 生成及 KV cache 解释推理依赖；区分 encoder-only、decoder-only、encoder–decoder，并说明交叉注意力的来源和维度。"
+          }
+        ],
+        "note": "三项均有具体且正确的解释；补充了损失遮罩、位置外推边界等细节，篇幅较长。无文件产物需要核验。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "从 token ID、embedding 出发，串联注意力、残差、归一化、FFN、多层堆叠和词表 logits；解释绝对位置、相对偏置及 RoPE 如何提供位置关系，以及 FFN 如何加工已融合上下文的表示。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "给出缩放点积注意力公式及逐位置加权求和，明确 Q/K/V 为 B×H×T×d_h、分数为 B×H×T×T，并解释缩放与 softmax 方向；用矩阵说明因果 mask 在 softmax 前屏蔽未来。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "用 teacher forcing、错位目标及交叉熵解释训练并行，用生成结果接回前缀解释推理的逐步依赖；说明 prefill、decode、KV cache 及单步维度，并介绍编码器—解码器和交叉注意力。"
+          }
+        ],
+        "note": "三项均得到充分覆盖，训练与推理的信息依赖解释清楚。无文件产物需要核验。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答都完整串联了任务要求的机制，公式、维度和因果关系正确。X 的补充范围稍广，Y 的叙述稍紧凑；这些差异未形成标准满足程度上的实质差距。"
+  },
+  "usage": {
+    "input_tokens": 19540,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 788,
+    "reasoning_output_tokens": 56
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

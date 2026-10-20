@@ -1,0 +1,67 @@
+{
+  "scenario": "core-08",
+  "repetition": 2,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "18e250d2c7804b611901e8b39ed1cceef6fab53811de6eafd772898fe681cded",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "first_turn_preserves_files 检查通过；第一轮说明了常量调整的影响及实际过期行为无法确认，未更换组件。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "最终 src/cache.py 为 TTL_SECONDS = 120，cache_key 函数保持原样；三个文件的 exact_file 检查均通过，冻结文件内容不变。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "第二轮实际产物落实了 TTL 修改，同时保留 PostgreSQL、Redis 配置及冻结文件；回答报告了修改和验证，没有停留在建议。"
+          }
+        ],
+        "note": "全部满足。第一轮说明稍长，但限定条件清楚。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "first_turn_preserves_files 检查通过；第一轮说明了变更范围、条件性影响和冻结项，未更换组件。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "最终 src/cache.py 为 TTL_SECONDS = 120，cache_key 函数保持原样；三个文件的 exact_file 检查均通过，冻结文件内容不变。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "第二轮实际完成 TTL 修改，冻结文件与组件配置保留；回答报告了修改和验证，以实际产物兑现授权操作。"
+          }
+        ],
+        "note": "全部满足，说明较精炼。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答的产物和逐项检查结果一致，均满足两轮要求；表达长度略有差异，但无实质完成度差异。"
+  },
+  "usage": {
+    "input_tokens": 14525,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 483,
+    "reasoning_output_tokens": 0
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

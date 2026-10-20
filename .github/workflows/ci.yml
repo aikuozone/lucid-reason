@@ -1,0 +1,30 @@
+name: Offline checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  distribution:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install offline validation dependency
+        run: python3 -m pip install -r requirements-dev.txt
+      - name: Validate metadata and documentation links
+        run: python3 scripts/validate_project.py
+      - name: Test distribution behavior
+        run: python3 -m unittest discover -s tests -v
+      - name: Build deterministic runtime package
+        run: python3 scripts/build_release.py
+      - name: Verify archive checksum
+        working-directory: dist
+        run: sha256sum -c SHA256SUMS

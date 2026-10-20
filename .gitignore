@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+.evalraw/
+.agents/skills/
+.env
+.env.*
+!.env.example
+.DS_Store

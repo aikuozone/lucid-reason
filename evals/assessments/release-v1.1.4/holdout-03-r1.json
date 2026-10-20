@@ -1,0 +1,67 @@
+{
+  "scenario": "holdout-03",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "c239e9a6ab697b494c8c1f09efe405a88c537125f205b48fc462bcc9e940712f",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "区分“一起变化”和“改变一件事会引起另一件事变化”，并指出共同原因、反向因果或巧合也能产生相关。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "以炎热天气共同影响冰淇淋销量与溺水人数为例；提出随机分组、对一组干预并比较结果的识别办法。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "全文即使计入标点也不足180字，内容围绕定义、例子和识别办法，没有堆砌工作流。"
+          }
+        ],
+        "note": "三项均满足。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "明确说明两件事同时变化不代表一件导致另一件，并用共同天气因素解释相关。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "冰淇淋销量与溺水人数的例子恰当；提出随机对照实验，通过随机分组、改变研究因素并比较结果来减少干扰。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "全文即使计入标点也不足180字，直接给出解释、例子与办法，没有额外流程内容。"
+          }
+        ],
+        "note": "三项均满足。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答都准确、完整且符合长度限制。X解释稍充分，Y稍简洁，差异不足以构成实质偏好。"
+  },
+  "usage": {
+    "input_tokens": 13565,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 502,
+    "reasoning_output_tokens": 36
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

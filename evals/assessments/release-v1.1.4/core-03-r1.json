@@ -1,0 +1,67 @@
+{
+  "scenario": "core-03",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "35bbc8d01f3beaadb5c536940222022e73ec408a3ceada9157a620f63aa75fe1",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "baseline",
+    "Y": "lr"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "明确说明 efSearch 控制底层搜索保留的候选结果集合规模，并指出实际访问节点数、距离计算次数可能超过 efSearch；解释增大它通常提高召回并增加延迟。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "分别说明 M 控制图连接规模，efConstruction 控制建索引插入节点时的搜索宽度，efSearch 控制已有图上的查询搜索宽度，且可在同一索引上调整。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "要求固定索引和实验条件，以精确 top-k 为基准扫描 efSearch，同时测 Recall@k、延迟分位数和吞吐，选择稳定满足约束的最小值；明确扫描数值仅为示例，不存在通用最佳值。"
+          }
+        ],
+        "note": "三项均满足。没有文件产物需要核验；回答给出了可执行的测量与选择方法。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "区分待扩展候选集合与当前最好结果集合，说明后者容量由 efSearch 控制；明确实际访问节点数和距离计算次数可以超过它，并解释召回与延迟的典型变化。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "分别说明 M 是图连接数量预算，efConstruction 是插入节点寻找邻居的搜索广度，efSearch 是查询搜索广度，并区分前两者通常需要重建、后者通常无需重建。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "要求固定数据、索引、硬件和实现配置，对代表性查询建立精确 top-k，扫描 efSearch 并测召回、延迟和吞吐，再以独立查询集验证；明确最终应选实测达标值而非通用常数。"
+          }
+        ],
+        "note": "三项均满足。没有文件产物需要核验；停止条件和实验控制的补充细节与任务相关。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答均准确覆盖全部标准，提供了相近且可操作的调参方法。Y 对搜索机制和实验细节稍多展开，X 相对紧凑，但不足以构成实质优劣。"
+  },
+  "usage": {
+    "input_tokens": 15754,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 673,
+    "reasoning_output_tokens": 35
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

@@ -1,0 +1,67 @@
+{
+  "scenario": "decision-02",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "caf50ed9de100287635915ff03d084219177f0b6e255b83d8ece329dee9f5389",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "明确指出现有接口及其组合无法满足硬要求，必须扩展现有接口或新增受控审批接口。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "提出从可信认证上下文获取审批人并验证权限，绑定原请求标识及版本或快照、结果和服务端时间，并让结果与审计共同提交、禁止绕过。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "明确审计保存失败时结果不得生效，补齐前阻止不合规写入；给出每次生效结果均有完整持久审计的验收条件，以及身份缺失、存储失败、进程中断、重复请求等验证场景。"
+          }
+        ],
+        "note": "完整满足三项标准；属于设计建议，未声称已经实测，也无文件产物可核验。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "明确认定现有写接口及功能组合无法保证审计完整，要求新增或改造接口。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "要求绑定可信认证的审批人、原请求标识与版本、审批结果及服务端时间，并原子提交结果与审计，禁止绕过和保护审计记录。"
+          },
+          {
+            "index": 3,
+            "met": false,
+            "evidence": "明确审计写入失败时审批结果不能落库，也支持增加必要能力；但未说明如何验收或通过哪些故障场景验证保证成立。"
+          }
+        ],
+        "note": "方案简洁且核心一致性要求正确，但缺少验收办法。"
+      }
+    ],
+    "preference": "X",
+    "comparison_note": "X提供了可核对的验收条件和故障验证场景，且明确校验审批权限；Y缺少验收办法，构成实质差异。"
+  },
+  "usage": {
+    "input_tokens": 13969,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 581,
+    "reasoning_output_tokens": 46
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

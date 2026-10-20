@@ -1,0 +1,52 @@
+{
+  "scenario": "core-02",
+  "title": "Agent 参数校验链路",
+  "group": "core",
+  "variant": "lr",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:43:37.466730+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\nLLM 要调用 transfer_money(from_account, to_account, amount)。请说明 BaseModel 如何参与完整工具调用链路，直到确认转账结果。提供机制和必要失败路径。这里没有真实账户或执行工具。",
+      "response": "假设这里的 **BaseModel 指 Pydantic 的 `BaseModel`**，下面按 Pydantic v2 的接口名称说明；币种和金额精度由系统预先规定。本文只解释机制，没有执行转账。\n\n**BaseModel 负责把不可信的工具参数转换成经过校验的数据，也可校验工具返回结果。它不负责授权、执行转账或证明资金到账。**\n\n完整链路是：\n\n```text\n定义参数模型并发布工具 Schema\n→ LLM 生成工具调用\n→ 解析与参数校验\n→ 业务规则、身份权限和事实检查\n→ 执行转账\n→ 校验回执、核查交易状态\n→ 向用户报告已确认的结果\n```\n\n1. **开发者定义参数契约，并注册工具。**\n\n   例如定义继承 `BaseModel` 的 `TransferArgs`：\n\n   | 字段或约束 | 作用 |\n   |---|---|\n   | `from_account: str` | 声明付款账户标识 |\n   | `to_account: str` | 声明收款账户标识 |\n   | `amount: Decimal` | 使用十进制表达金额，避免二进制浮点误差 |\n   | 金额有限、严格大于零、符合币种精度 | 排除非法数值及不允许的小数位 |\n   | 禁止额外字段 | 拒绝未声明的参数 |\n   | 两个账户不同 | 检查字段之间的静态业务关系 |\n\n   字段类型、`Field` 约束和自定义 validator 共同实现这些规则；**仅写 `Decimal` 并不会自动获得全部金额约束**。类型转换也必须显式设计，不能让不符合约定的输入被悄悄转换或舍入。\n\n   `TransferArgs.model_json_schema()` 可以生成 JSON Schema，供宿主适配成工具的参数描述。宿主还必须注册工具名称与实际函数的映射；BaseModel 本身不会注册或调用函数。\n\n2. **LLM 根据工具描述生成调用请求。**\n\n   模型输出工具名 `transfer_money`、参数 JSON，以及协议中的调用标识。此时得到的是**调用提议**，尚未发生转账。\n\n   Schema 帮助模型理解参数，即使平台提供受约束输出，也不能由此推断账户存在、用户有权限或余额足够。\n\n3. **宿主解析参数，并调用 BaseModel 校验。**\n\n   宿主先确认工具名在允许列表中，再处理参数：\n\n   - 参数是 JSON 字符串时，可以用 `TransferArgs.model_validate_json(...)`。\n   - 参数已经解析为字典时，可以用 `TransferArgs.model_validate(...)`。\n\n   校验成功得到一个类型明确的对象，例如 `args.amount` 是 `Decimal`；失败则得到可定位到字段的 `ValidationError`。宿主必须阻止失败参数进入执行函数。\n\n   因而，真正的边界是：**模型生成的数据必须经过宿主校验，才能成为执行输入。**\n\n4. **校验业务语义、身份权限和实时事实。**\n\n   BaseModel 的 validator 适合检查金额范围、账户不能相同等确定性规则。账户是否存在、账户状态、余额、转账限额和权限等，需要应用服务查询可信系统。\n\n   尤其要区分：\n\n   - `from_account` 格式正确，不代表当前用户拥有付款权限。\n   - LLM 说“用户已同意”，不能替代系统取得的有效授权。\n   - 用户授权必须绑定具体付款账户、收款账户和金额；参数改变后，应重新判断授权是否有效。\n\n   若产品要求转账前确认，宿主应先展示具体交易并取得确认，再执行。这里是在描述系统设计，不是在请求执行真实转账。\n\n5. **宿主调用执行器，执行器保护资金一致性。**\n\n   检查通过后，宿主才调用：\n\n   ```python\n   transfer_money(\n       from_account=args.from_account,\n       to_account=args.to_account,\n       amount=args.amount,\n   )\n   ```\n\n   执行层仍须在事务或等效的一致性机制内重新检查余额与限额，再完成记账，防止“检查通过后余额被另一笔交易改变”。\n\n   宿主还应为这一次业务转账建立持久化的**幂等键**：相同请求重试时复用同一个键，执行端保证不会重复扣款，并拒绝同键对应不同参数。幂等键可通过可信执行上下文传递，不必改变题设的三个业务参数。协议中的工具调用 ID 不自动具备这种去重能力。\n\n6. **接收并验证结果，再确认业务状态。**\n\n   返回值也可以用另一个 BaseModel，例如 `TransferResult`，校验交易 ID、状态、金额、账户和错误码的结构，并约束“成功状态必须包含交易 ID”等关系。\n\n   但**回执格式正确不等于转账成功**。宿主还要：\n\n   - 将回执与本次请求、幂等键及预期交易内容对应起来。\n   - 区分“已受理”“处理中”“失败”和系统定义的最终成功状态。\n   - 必要时根据交易 ID 查询可信交易系统或账本，确认状态。\n\n   内部转账的成功可能要求借贷记账均已提交；跨机构转账的“已提交”则可能尚未到账。能确认到哪一步，取决于后端的状态契约。\n\n7. **把可信结果关联回工具调用，再向用户报告。**\n\n   宿主将结果关联到原工具调用，供 LLM 组织回复。最终回复只能表达已经确认的状态，例如“已受理，正在处理”或“转账已完成，交易编号为……”。\n\n   交易状态应由宿主和业务系统维护，不能依赖 LLM 自己记住或判断成功。\n\n必要失败路径如下：\n\n| 失败位置 | 应如何处理 |\n|---|---|\n| JSON 损坏、缺字段、类型或静态约束错误 | 不执行；返回精简的字段错误，允许有限次数修复。缺少真实账户或金额时向用户澄清，不能猜测 |\n| 账户不存在、权限不足、授权缺失、余额不足 | 停止执行或进入规定的授权流程；不能通过改写参数绕过拒绝 |\n| 明确返回业务失败 | 记录并报告失败；只有明确可重试的情况才按策略重试 |\n| 超时、断网、进程崩溃、执行后回执校验失败 | **结果未知，可能已经扣款**；先按幂等键或交易 ID 查状态，不能直接重新发起新转账 |\n| 返回处理中 | 保留待确认状态，通过查询或可信回调追踪，不提前宣称到账 |\n| 回执内容不匹配或状态矛盾 | 停止自动确认，查询权威记录；无法判定时明确报告尚未确认 |\n\n因此，BaseModel 贯穿的是**参数契约、运行时校验和结果结构校验**；完整工具链还必须由宿主闭合授权、执行、一致性、重试与状态确认。当前没有真实执行器或交易回执，所以这里只能说明确认机制，不能确认任何实际转账结果。",
+      "exit_code": 0,
+      "elapsed_seconds": 41.101,
+      "usage": {
+        "input_tokens": 34623,
+        "cached_input_tokens": 27136,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1878,
+        "reasoning_output_tokens": 162
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md'",
+          "exit_code": 0,
+          "output_sha256": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152"
+        }
+      ]
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:44:21.513534+00:00",
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "source_hash_verification": "Observed installed files after run; workspaces retained unchanged."
+}

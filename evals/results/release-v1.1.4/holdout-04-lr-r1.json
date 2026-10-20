@@ -1,0 +1,51 @@
+{
+  "scenario": "holdout-04",
+  "title": "English transfer",
+  "group": "holdout",
+  "variant": "lr",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-20T00:49:09.477200+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\nA cache hit rate rose from 60% to 90%, but API p95 latency worsened from 180ms to 450ms after adding a remote cache. Give an evidence-based diagnosis plan in English. No request traces are available yet.",
+      "response": "**A higher hit rate does not establish a latency improvement.** The reported change is a 30 percentage-point increase in hits alongside a 2.5× increase in API p95. With no request traces, the remote cache is a suspect, but the root cause remains unverified.\n\nAssume a cache-aside flow: a request checks the cache, fetches from the backend on a miss, and may populate the cache before returning. Verify this assumption against the implementation.\n\n1. **Establish a comparable baseline.** Check that both measurements use the same endpoints, traffic mix, request rate, concurrency, regions, measurement boundary, and time windows. Confirm whether “hit rate” means local hits, remote hits, combined hits, or hits per lookup rather than per API request. Compare errors and timeouts too; excluding failed requests can distort latency comparisons.\n\n2. **Measure the request paths before assigning blame.** Add lightweight request-level timers and latency histograms, even before full tracing is available:\n   - Total API latency, classified by local hit, remote hit, miss, and cache error/timeout.\n   - Cache connection-pool wait, connection establishment, command duration, retry count, and serialization/deserialization.\n   - Backend duration and any cache population awaited before responding.\n   - Cache lookups per request, payload size, endpoint, and region.\n\n   Use existing application, cache, and backend metrics to check CPU, memory/GC, connection saturation, queueing, network errors, and backend load. Preserve latency distributions; averages alone will hide the tail.\n\n3. **Test competing explanations in this order.**\n\n   | Hypothesis and mechanism | Evidence to seek | What would weaken it |\n   |---|---|---|\n   | Remote hits add expensive network round trips, large-value decoding, or multiple sequential lookups. | Slow remote-hit requests; high client command/decode times; many lookups per request. | Remote-hit requests stay fast, with little time spent in these stages. |\n   | Connection contention, retries, or timeouts delay requests before fallback. | Pool wait, connection churn, retry counts, and latency clusters near configured timeout boundaries. | Negligible waiting/retries, with slow requests completing cache calls quickly. |\n   | Misses now pay cache lookup **plus** backend fetch **plus** synchronous population; expiry bursts may overload the backend. | Slow miss/error paths; time spent awaiting writes; correlated miss bursts and backend queues. | Miss paths remain comparable to baseline and backend load is stable. |\n   | Cache-related CPU, GC, or shared-worker contention slows all requests. | Increased resource pressure and application queueing, including on otherwise fast paths. | Stable resources and queue times, with delay isolated elsewhere. |\n   | Traffic, deployment, or metric definitions changed independently. | Endpoint/region mix shifts, concurrent releases, or changed hit-rate denominators. | Matched cohorts and unchanged definitions reproduce the regression. |\n\n   **A 90% hit rate still leaves 10% misses**, enough to contain the API’s slowest 5% under a simple one-lookup-per-request model. Conversely, slow hits can also drive p95. Do not average or add component p95 values to reconstruct API p95.\n\n4. **Run a controlled isolation experiment.** Compare the previous cache path with the remote-cache path using matched traffic, identical application versions, and comparable warm-up. Start with controlled replay or a small canary. Guard backend capacity: bypassing the remote cache can increase backend traffic and confound the result. Then vary one suspected factor at a time—such as connection reuse, retry behavior, or synchronous population—and measure both request latency and backend impact.\n\n5. **Confirm the mechanism and validate the fix.** Treat a cause as supported when the suspected delay appears in affected requests and removing it improves latency reproducibly under comparable load. Validate API p95/p99, errors, throughput, backend load, and response correctness during steady traffic, bursts, cold starts, and cache failures. If production impact requires immediate mitigation, use a guarded rollback while preserving available evidence.\n\nThe first decisive evidence is **end-to-end latency split by cache outcome, paired with cache wait/command time and backend time**. That distinguishes slow hits, expensive misses, and system-wide contention far more effectively than the aggregate hit rate.",
+      "exit_code": 0,
+      "elapsed_seconds": 28.074,
+      "usage": {
+        "input_tokens": 36507,
+        "cached_input_tokens": 27136,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 989,
+        "reasoning_output_tokens": 0
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md .agents/skills/systematic-knowledge-construction/references/evidence-and-review.md'",
+          "exit_code": 0,
+          "output_sha256": "87b32e0e7142b97857f1830ef79d5f91f23a0f04041e5aa5690df4c81435ce19"
+        }
+      ]
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "artifacts": {},
+  "completed_at": "2026-10-20T00:49:37.552249+00:00"
+}

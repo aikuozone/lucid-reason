@@ -1,0 +1,34 @@
+{
+  "environment": {
+    "python": "3.12.3",
+    "platform": "Linux x86_64",
+    "PyYAML": "6.0.3",
+    "dependency_environment": "isolated tooling environment"
+  },
+  "checks": [
+    {
+      "command": "python3 scripts/validate_project.py",
+      "exit_code": 0,
+      "result": "pass",
+      "observed_output": "PASS: packaging, metadata, scenario inventory, and local Markdown links\n"
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -v",
+      "exit_code": 0,
+      "result": "pass",
+      "observed_output": "test_archive_contains_exact_runtime_files_and_hidden_manifest (test_distribution.DistributionTests.test_archive_contains_exact_runtime_files_and_hidden_manifest) ... ok\ntest_archive_is_reproducible (test_distribution.DistributionTests.test_archive_is_reproducible) ... ok\ntest_broken_html_image_is_rejected (test_distribution.DistributionTests.test_broken_html_image_is_rejected) ... ok\ntest_extracted_archive_can_be_installed (test_distribution.DistributionTests.test_extracted_archive_can_be_installed) ... ok\ntest_identical_install_is_idempotent (test_distribution.DistributionTests.test_identical_install_is_idempotent) ... ok\ntest_installer_copies_all_reference_bytes (test_distribution.DistributionTests.test_installer_copies_all_reference_bytes) ... ok\ntest_invalid_frontmatter_is_rejected (test_distribution.DistributionTests.test_invalid_frontmatter_is_rejected) ... ok\ntest_local_edits_are_preserved (test_distribution.DistributionTests.test_local_edits_are_preserved) ... ok\ntest_manifest_drift_is_rejected (test_distribution.DistributionTests.test_manifest_drift_is_rejected) ... ok\ntest_missing_reference_is_rejected (test_distribution.DistributionTests.test_missing_reference_is_rejected) ... ok\ntest_project_invariants (test_distribution.DistributionTests.test_project_invariants) ... ok\ntest_symlink_destination_is_rejected (test_distribution.DistributionTests.test_symlink_destination_is_rejected) ... ok\ntest_symlink_source_is_rejected (test_distribution.DistributionTests.test_symlink_source_is_rejected) ... ok\ntest_authorized_fixture_changes_match_actual_artifacts (test_evidence.EvidenceTests.test_authorized_fixture_changes_match_actual_artifacts) ... ok\ntest_environment_matches_records_and_source_version (test_evidence.EvidenceTests.test_environment_matches_records_and_source_version) ... ok\ntest_every_scenario_has_two_completed_primary_conditions (test_evidence.EvidenceTests.test_every_scenario_has_two_completed_primary_conditions) ... ok\ntest_observed_skill_reads_and_frozen_source (test_evidence.EvidenceTests.test_observed_skill_reads_and_frozen_source) ... ok\n\n----------------------------------------------------------------------\nRan 17 tests in 0.315s\n\nOK\n"
+    },
+    {
+      "command": "python3 scripts/build_release.py",
+      "exit_code": 0,
+      "result": "pass",
+      "observed_output": "<repository>/dist/lucid-reason-1.1.4.zip\nsha256: 75f6e680474680c7db1b9b916c706fa041e3bd2f49285b237edd4831e30c09c5\n"
+    },
+    {
+      "command": "cd dist && sha256sum -c SHA256SUMS",
+      "exit_code": 0,
+      "result": "pass",
+      "observed_output": "lucid-reason-1.1.4.zip: OK\n"
+    }
+  ]
+}

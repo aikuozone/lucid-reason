@@ -1,0 +1,33 @@
+{
+  "scenario": "core-02",
+  "title": "Agent 参数校验链路",
+  "group": "core",
+  "variant": "baseline",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:43:11.826223+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\nLLM 要调用 transfer_money(from_account, to_account, amount)。请说明 BaseModel 如何参与完整工具调用链路，直到确认转账结果。提供机制和必要失败路径。这里没有真实账户或执行工具。",
+      "response": "假设这里的 `BaseModel` 指 **Pydantic 的 `BaseModel`**。它负责定义、校验和序列化工具的输入与输出；真正发起转账、鉴权和确认入账的是应用及转账后端。以下是机制说明，没有执行任何转账。\n\n完整链路可以表示为：\n\n`用户意图 → 工具参数 Schema → LLM 生成调用请求 → 应用校验 → 后端执行 → 结果校验 → LLM 向用户报告`\n\n1. **用 BaseModel 定义参数契约**\n\n   定义 `TransferArgs(BaseModel)`，包含 `from_account`、`to_account`、`amount`，并配置必填字段、账户标识格式、金额必须大于零、拒绝多余字段等约束。\n\n   金额应采用明确的精确表示，例如最小货币单位的整数，或按约定精度解析的十进制字符串，避免二进制浮点误差。这里假设币种已由账户或业务上下文确定；否则还需要币种信息。\n\n   `TransferArgs.model_json_schema()` 可以生成 JSON Schema，由应用适配为工具声明，提供给 LLM。**BaseModel 本身不会把工具注册给模型，也不会执行函数。**\n\n2. **LLM 生成工具调用请求**\n\n   LLM 根据用户意图返回工具名 `transfer_money` 和 JSON 参数。它生成的是调用请求，不能据此认为资金已经转移。\n\n   即使模型或接口支持按 Schema 生成参数，应用端仍需校验。\n\n3. **应用解析与验证**\n\n   应用检查工具名是否在允许列表中，并通过例如 `TransferArgs.model_validate_json(arguments)` 解析和校验参数。类型转换应明确配置，避免宽松转换接受不符合预期的输入。\n\n   BaseModel 可以验证字段格式、金额范围，以及“转出和转入账户不能相同”等跨字段规则；但它不能仅凭这些字段证明账户存在、用户有权限、余额足够。\n\n4. **应用检查授权，调用转账后端**\n\n   应用结合当前登录身份检查账户操作权限；业务要求用户确认时，应先展示明确的转出账户、收款账户和金额并取得确认。\n\n   随后，后端权威检查账户状态、币种、余额和限额，并以事务等机制保证扣款与入账的一致性。应用还应为这一次业务操作建立并持久化幂等键，防止重试造成重复转账。工具调用 ID 用于关联消息，不能默认替代业务幂等键。\n\n5. **用 BaseModel 校验工具结果**\n\n   可定义 `TransferResult(BaseModel)`，约定 `transaction_id`、`status`、金额、账户及错误码等字段，状态至少区分：\n\n   - `succeeded`：后端已确认完成。\n   - `failed`：后端已确认失败。\n   - `pending`：仍在处理。\n   - `unknown`：当前无法确定结果。\n\n   应用校验后端响应，再把序列化结果作为对应调用的工具结果交给 LLM。**输出通过 BaseModel 校验，只说明结构符合契约；结果是否可信仍取决于权威后端。**\n\n6. **确认最终结果并回复用户**\n\n   若后端同步返回权威的成功结果，可报告成功并提供交易编号。若返回处理中，则通过交易查询或可信回调继续跟踪，直到得到终态。\n\n   HTTP 请求成功、工具函数正常返回，或 LLM 说“已转账”，都不能单独证明转账完成。\n\n必要的失败路径包括：\n\n| 情况 | 必要处理 |\n|---|---|\n| JSON 无法解析、字段缺失、金额不合法 | 不执行；返回结构化校验错误，要求修正参数 |\n| 账户或金额含糊 | 请求用户补充，不能自行猜测 |\n| 无权限、余额不足、账户冻结等 | 后端拒绝，返回明确失败原因 |\n| 请求超时或连接中断 | 标记结果待核实；按幂等键或交易编号查询，不能直接认定失败并重新转账 |\n| 后端响应不符合结果模型 | 记录协议异常并核实交易状态，不能因解析失败就认定未扣款 |\n| 重复调用或重试 | 后端利用同一幂等键返回原操作结果，避免重复扣款 |\n| 长时间处理中 | 如实报告尚未确认，继续查询或进入人工核对流程 |\n\nBaseModel 因而参与的是**输入与输出的契约边界**；“转账已完成”的依据，是后端可核实的交易终态。",
+      "exit_code": 0,
+      "elapsed_seconds": 31.16,
+      "usage": {
+        "input_tokens": 13087,
+        "cached_input_tokens": 11392,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1277,
+        "reasoning_output_tokens": 241
+      },
+      "tool_trace": []
+    }
+  ],
+  "artifact_checks": [],
+  "skill_load_observed": false,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:43:45.945090+00:00",
+  "installed_skill_files_sha256": {}
+}

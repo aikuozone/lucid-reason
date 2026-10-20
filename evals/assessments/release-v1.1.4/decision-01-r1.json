@@ -1,0 +1,67 @@
+{
+  "scenario": "decision-01",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "7136d0201a92fb9ce65078f22565702ddc07f26425c0241a88aa3671351f96ce",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "根据每周一次、每次3分钟且无已知错误，计算年节省上限为2.6小时；以开发需8小时为条件估算约3.1年回本，并计入接入、测试和维护负担。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "明确建议本月保留复制流程；提出频率、参与人数或错误损失显著增加，以及出现极低成本现成功能时重新评估。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "明确不开发单独集成模块，仅在已有导出或导入功能可顺手复用时考虑使用，决策依据是收益能否覆盖实施和维护成本。"
+          }
+        ],
+        "note": "建议明确，计算正确，且说明一天开发成本只是估算情景。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "结合低频、3分钟耗时和无已知错误，计算每年操作成本约2.6小时；以开发需一天为条件估算约3.1年回本，并指出测试、维护及接口变化成本。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "建议保留现有流程，将有限改进时间用于其他环节；列出操作量增长、开始出现错误或可极低成本自动化作为重评条件。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "直接反对当前开发单独模块，没有将技术可集成视为开发理由，而是要求收益与成本相称。"
+          }
+        ],
+        "note": "完整覆盖三项标准，表达较紧凑。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答的建议、量化依据、维护成本考虑和重新评估条件实质一致。Y略简洁，X多解释了假设与复用方式，但不足以形成实质优劣。"
+  },
+  "usage": {
+    "input_tokens": 13963,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 581,
+    "reasoning_output_tokens": 32
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

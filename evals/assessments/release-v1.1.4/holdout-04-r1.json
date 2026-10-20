@@ -1,0 +1,67 @@
+{
+  "scenario": "holdout-04",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "d96159b358e543be1b02bfce42b6abecd2f86d5bec24cfedf77ad4d3f4ba7b63",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "全文为英语；明确表示“the root cause remains unverified”，将远程缓存视为待验证嫌疑因素。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "分别测量缓存连接等待、命令和解码耗时、miss 后端访问及同步回填；讨论剩余 10% misses 对 p95 的影响，并检查流量、并发、区域和指标口径变化。"
+          },
+          {
+            "index": 3,
+            "met": false,
+            "evidence": "提出按缓存结果分类计时、匹配流量 canary 和单因素实验，并逐项列出削弱假设的证据。但仅提及“guarded rollback”，没有规定何种延迟、错误率或后端负载变化应触发回滚。"
+          }
+        ],
+        "note": "诊断覆盖充分，假设可证伪；缺少可执行的回滚判据，篇幅较长。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "全文为英语；明确表示“The cause is unconfirmed without timing evidence”，没有把任何解释当作已证实原因。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "区分缓存网络及连接获取、序列化、miss 后端请求和回填耗时；解释 10% misses 仍可能决定 p95，并核查流量结构、负载和部署变化。"
+          },
+          {
+            "index": 3,
+            "met": false,
+            "evidence": "提出采样请求计时、分组直方图，以及控制流量、并发和缓存预热状态的 canary 或负载测试；但没有规定实验或修复何时必须回滚。"
+          }
+        ],
+        "note": "诊断计划清晰且较精炼；同样缺少回滚判据。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两者均满足前两项，第三项都缺少回滚触发条件。X 的反证说明更明确，Y 的表达更紧凑，整体没有足以形成偏好的实质差异。"
+  },
+  "usage": {
+    "input_tokens": 14881,
+    "cached_input_tokens": 11392,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 684,
+    "reasoning_output_tokens": 107
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

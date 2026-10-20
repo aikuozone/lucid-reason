@@ -1,0 +1,58 @@
+{
+  "scenario": "core-09",
+  "title": "连续追问与前提变化",
+  "group": "core",
+  "variant": "baseline",
+  "repetition": 2,
+  "test_type": "multiturn",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-20T00:51:15.768438+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n我们的只读文章缓存可以接受最多 60 秒陈旧，只有一个公共权限组、每秒 5 次查询。提出满足这些已知约束的简单方案，先保留现有 Redis。",
+      "response": "工作区未发现项目文件；以下假设文章数据来自现有数据库，且各查询结果对所有用户相同。\n\n建议先用 **Redis Cache-Aside，固定 TTL 60 秒**：\n\n- **缓存键**：按文章 ID 或规范化后的查询参数生成；只有一个公共权限组，无需按用户拆分缓存。\n- **读取**：命中 Redis 直接返回；未命中则查询数据库并写入 Redis。\n- **过期**：读取不续期，过期后不返回旧值。为把回源耗时计入陈旧时间，从数据库查询开始计时，写缓存时扣除已用时间；超过 60 秒则不缓存。\n- **更新**：暂不增加消息队列、主动失效或后台刷新，依靠过期满足陈旧容忍度。\n- **故障**：Redis 不可用时直接查数据库。按总流量每秒 5 次查询理解，先不增加分布式锁；假设数据库可以承受该回源量。\n\n先观察命中率、回源延迟和错误率即可，暂不增加本地缓存或更换 Redis。",
+      "exit_code": 0,
+      "elapsed_seconds": 19.299,
+      "usage": {
+        "input_tokens": 39851,
+        "cached_input_tokens": 37504,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 464,
+        "reasoning_output_tokens": 22
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc \"pwd; rg --files -g 'AGENTS.md' -g '*README*' -g '*cache*' -g '*redis*' -g '*article*' -g '*文章*' -g 'package.json' -g 'pyproject.toml' -g 'go.mod'\"",
+          "exit_code": 1,
+          "output_sha256": "0e6ec492e4e76647d6691023c18f4f896352a990b05758dd7abf31eaa2610952"
+        },
+        {
+          "command": "/bin/bash -lc \"rg --files --hidden -g '\"'!.git'\"'\"",
+          "exit_code": 1,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n补充更正：内容包含按用户授权的财务附件，权限被撤回后不得再读到旧结果，只有正文允许陈旧 60 秒。上一轮哪些判断要调整，哪些还能保留？",
+      "response": "上一轮“所有查询结果对用户相同”的假设失效了。**正文可以缓存 60 秒，财务附件及其访问权限必须单独处理。**\n\n需要调整：\n\n- **不能共用完整结果缓存**：公共缓存只存正文，不混入附件内容、附件链接或用户可见性结果。正文仍假设对所有用户公开。\n- **附件每次读取都要校验当前权限**：包括附件列表、下载接口和实际文件访问；校验失败或权限服务不可用时拒绝访问，不能回退到旧的授权结果。\n- **仅按用户拆分缓存键也不够**：用户的旧缓存仍可能在撤权后命中。简单方案是暂不缓存授权判定，附件内容即使缓存，也必须先经过实时鉴权才能返回。\n- **不能直接发放撤权后仍有效的附件链接**：附件经受控接口读取，避免公开地址或独立有效的下载链接绕过鉴权。相关响应设置 `Cache-Control: no-store`，避免浏览器或代理直接复用旧响应。\n\n仍可保留：\n\n- 现有 Redis，以及正文的 Cache-Aside、固定 TTL、不因读取续期的方案。\n- 每秒 5 次查询下先保持简单，暂不引入消息队列、分布式锁或多层缓存；数据库及鉴权后端能承受回源量仍需作为假设。\n- Redis 故障时可回源，但附件必须先完成有效鉴权。\n\n这里假设“撤权后不得再读”指撤权完成后的新访问；已下载到用户设备的文件无法追回。如果连正在传输的下载也必须立即中止，还需要定义并实现传输中的撤权检查。",
+      "exit_code": 0,
+      "elapsed_seconds": 18.741,
+      "usage": {
+        "input_tokens": 53652,
+        "cached_input_tokens": 50816,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 851,
+        "reasoning_output_tokens": 22
+      },
+      "tool_trace": []
+    }
+  ],
+  "artifact_checks": [],
+  "skill_load_observed": false,
+  "installed_skill_files_sha256": {},
+  "artifacts": {},
+  "completed_at": "2026-10-20T00:51:53.809094+00:00"
+}

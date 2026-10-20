@@ -1,0 +1,18 @@
+{
+  "cli_version": "codex-cli 0.160.0",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "plugins_and_apps_disabled": true,
+  "isolated_workspaces": true,
+  "source_version": "1.1.4",
+  "skill_sha256": "b38613b090a13ecb18c53a5e537bf6cc39fe33b748b92edf3e3f4532085ab964",
+  "sampling_seed": "not exposed",
+  "temperature": "CLI default, not exposed",
+  "run_id": "probe-2026-10-20",
+  "limitations": [
+    "Uses one model and one local CLI host, not a cross-host benchmark",
+    "Natural-language implicit activation and plugin marketplace UI are not tested",
+    "No live web or external connectors are available",
+    "Additional transfer scenarios were authored by the publisher; they are not a sealed independent benchmark"
+  ]
+}

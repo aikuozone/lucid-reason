@@ -1,0 +1,46 @@
+{
+  "interface": {
+    "capabilities": [],
+    "category": "Productivity",
+    "defaultPrompt": [
+      "lr 什么是 pydantic basemodel？解释字段模型、运行时校验、错误、序列化及必要边界。",
+      "lr 系统讲解 transformer，建立完整主干、关键机制、模块间因果与适用限制。",
+      "lr 分析这个企业 agent 项目：先锁定现实基线，再讲清四条流、方案依据、异常和验收。",
+      "lr 设计一个生产级缓存方案：基于 LangGraph + FastAPI + Redis，保留项目基线和权限边界。",
+      "lr 排查 rag 混合检索效果下降的问题：用可证伪假设与真实证据逐层定位。"
+    ],
+    "developerName": "blunt",
+    "displayName": "lucid-reason",
+    "shortDescription": "lr · 系统性理解、因果推演、工程实践与可靠核验",
+    "longDescription": "lucid-reason（lr）适用于概念和完整领域学习、算法与跨学科知识、企业项目理解、工程设计、专业决策、故障诊断和研究。按实际目标建立必要知识结构，解释核心机制、因果关系、实践和边界；根据风险核验事实与证据，兼顾充分理解与清晰表达。可通过“lr 什么是 pydantic basemodel？”等自然语言表达调用意图；实际自动选择由宿主决定。无需额外服务。"
+  },
+  "name": "systematic-knowledge-architect",
+  "version": "1.1.4",
+  "description": "lucid-reason (lr): Systematic understanding and reliable problem solving for focused concepts, full-domain and multidisciplinary learning, realistic projects, engineering design, professional decisions, troubleshooting, research, and follow-up. Explains necessary mechanisms, causal links, boundaries, and evidence. Use for requests naming lr or lucid-reason and for relevant systematic reasoning tasks.",
+  "author": {
+    "name": "blunt"
+  },
+  "keywords": [
+    "lucid-reason",
+    "lr",
+    "systematic reasoning",
+    "reliable problem solving",
+    "systematic learning",
+    "knowledge architecture",
+    "concept understanding",
+    "causal reasoning",
+    "enterprise architecture",
+    "engineering decisions",
+    "root cause analysis",
+    "research validation",
+    "quality review",
+    "multidisciplinary learning",
+    "系统性学习",
+    "知识架构",
+    "原理与因果",
+    "项目设计",
+    "可靠验证",
+    "连续追问"
+  ],
+  "skills": "./skills"
+}

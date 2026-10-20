@@ -1,0 +1,77 @@
+{
+  "scenario": "core-07",
+  "repetition": 2,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "86ede6832a418caac00663b326eda798b650a4e0a976de08fc8841216236547f",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "指出向量下降26个百分点、融合下降19个百分点，退化已发生在重排前；优先检查向量链路，并明确具体根因尚待确认。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "提出旧／新 embedding 与旧／新 chunk 四组对照，固定语料、权限和检索参数；通过过滤前后候选、相关项删除位置及原因核验过滤假设。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "要求整体回滚匹配的模型、chunk、文档向量和索引，并在固定100查询上验收；以分路恢复但融合仍差、相关项进入重排后被排低等信号区分假设。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "明确不能认定 reranker 已坏，要求固定候选输入比较重排版本，并说明不同阶段、不同K的召回指标不能直接解释为重排独立效果。"
+          }
+        ],
+        "note": "覆盖完整，过滤与重排的判别信号较明确；篇幅较长，但内容主要服务于排查与恢复。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "依据向量与融合召回下降判断重排前已有退化，安排优先检查向量链路，同时保留 reranker 也可能存在问题的可能性。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "提出基线、只换模型、只换chunk和两者都换的对照，固定其他参数；结合过滤前后记录、过滤原因和相关文档首次消失阶段区分过滤异常。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "要求完整回滚检索版本并用固定评测验证恢复；通过相同候选下的新旧重排比较，以及相关文档首次消失阶段，检验上游与重排假设。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "开头和结尾均拒绝直接归因 reranker，并提出固定候选验证，区分未召回与已召回但未进入前五。"
+          }
+        ],
+        "note": "排查与恢复顺序清楚，表达更精简；过滤假设通过日志和逐阶段追踪得到检验。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答均满足全部标准。X的实验和判别信号更细，Y更简洁；核心排查逻辑、回滚及回归要求没有实质差异。"
+  },
+  "usage": {
+    "input_tokens": 14972,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 819,
+    "reasoning_output_tokens": 106
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

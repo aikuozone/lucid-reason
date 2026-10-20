@@ -1,0 +1,51 @@
+{
+  "scenario": "holdout-05",
+  "title": "可信计算与业务取舍",
+  "group": "holdout",
+  "variant": "lr",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-20T00:49:19.757558+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\n平均到达率是每秒 80 个请求，平均响应时间 250ms。有人说因此峰值并发必然是 20，买一台支持 20 并发的服务器就够了。解释计算成立的条件和不能由它推出的采购结论。",
+      "response": "**\\(80\\times0.25=20\\) 在适用条件下表示平均在途请求数，不能推出峰值并发是 20，也不能据此认定一台支持 20 并发的服务器够用。**\n\n这是 Little 定律：\n\\[\nL=\\lambda W=80\\ \\text{请求/秒}\\times0.25\\ \\text{秒}=20\\ \\text{请求}\n\\]\n\n其中，\\(L\\) 是系统内请求数的时间平均值，\\(\\lambda\\) 是平均流入率，\\(W\\) 是请求在该系统内的平均停留时间。直观地说，每个请求从进入到离开，都贡献了一段“占用时间”；把这些时间累加，再除以观测时长，就得到平均在途请求数。\n\n这一计算需要满足以下条件：\n\n- **系统稳定、长期平均有意义**：请求没有持续积压，长期流入率和离开率一致；观测时间足够长，窗口首尾尚未完成的请求不会显著扭曲结果。\n- **统计边界一致**：80 请求/秒和 250ms 针对同一系统、同类请求及相应观测条件。不能把全天平均流量与低负载时延混用，也不能忽略失败、超时或被拒请求造成的统计偏差。\n- **响应时间与并发定义一致**：如果 250ms 包含排队，20 就包含等待和正在处理的请求；它不等于正在占用 CPU 的请求数，也不等于连接数。\n\n该定律**不要求请求均匀到达，也不要求到达服从泊松分布**。但它只给出平均关系，不给出波动或峰值。\n\n例如，一个**假设场景**：每秒同时到达 80 个请求，每个都在 250ms 后完成，其余 750ms 没有在途请求。那么平均到达率仍是 80/秒，平均响应时间仍是 250ms，平均并发为 \\(80\\times0.25=20\\)，而峰值并发是 **80**。因此，这两个平均值不足以确定峰值。\n\n采购还缺少关键依据：\n\n- “支持 20 并发”必须说明在什么业务、数据量和时延要求下测得；能接收 20 个请求，不等于能按要求完成它们。\n- 250ms 会随负载变化。资源接近饱和时，排队可能使响应时间增加，进而增加在途请求数，不能把它当成固定常数。\n- 需要知道突发流量、慢请求分布、P95/P99 时延与错误率目标，以及增长和故障冗余要求。\n\n合理的做法是用真实业务负载进行持续与突发压测，确认目标流量下的吞吐量、尾部时延、错误率和资源余量，再确定配置与台数。**目前只能有条件地算出平均在途请求约为 20，无法判断一台服务器是否足够，也无法推出应留多少余量。**",
+      "exit_code": 0,
+      "elapsed_seconds": 50.909,
+      "usage": {
+        "input_tokens": 34543,
+        "cached_input_tokens": 22784,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 779,
+        "reasoning_output_tokens": 0
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md'",
+          "exit_code": 0,
+          "output_sha256": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152"
+        }
+      ]
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "artifacts": {},
+  "completed_at": "2026-10-20T00:50:10.668367+00:00"
+}

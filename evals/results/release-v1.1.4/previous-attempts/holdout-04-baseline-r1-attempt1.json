@@ -1,0 +1,29 @@
+{
+  "scenario": "holdout-04",
+  "title": "English transfer",
+  "group": "holdout",
+  "variant": "baseline",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:49:13.228356+00:00",
+  "status": "blocked",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\nA cache hit rate rose from 60% to 90%, but API p95 latency worsened from 180ms to 450ms after adding a remote cache. Give an evidence-based diagnosis plan in English. No request traces are available yet.",
+      "response": "",
+      "exit_code": 1,
+      "elapsed_seconds": 4.794,
+      "usage": {},
+      "tool_trace": [],
+      "error": "You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 7:17 AM."
+    }
+  ],
+  "artifact_checks": [],
+  "skill_load_observed": false,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:49:18.024054+00:00",
+  "installed_skill_files_sha256": {},
+  "blocked_reason": "usage_limit"
+}

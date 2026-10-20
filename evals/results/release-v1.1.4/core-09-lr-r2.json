@@ -1,0 +1,65 @@
+{
+  "scenario": "core-09",
+  "title": "连续追问与前提变化",
+  "group": "core",
+  "variant": "lr",
+  "repetition": 2,
+  "test_type": "multiturn",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-20T00:51:19.091867+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\n我们的只读文章缓存可以接受最多 60 秒陈旧，只有一个公共权限组、每秒 5 次查询。提出满足这些已知约束的简单方案，先保留现有 Redis。",
+      "response": "建议采用 **现有 Redis + 按需读取真源 + 最长 60 秒固定过期**。当前只有一个公共权限组、每秒 5 次查询，先用这条简单链路即可。\n\n假设文章来自数据库或已有接口，能够读取最新已提交内容；真源能承受缓存故障时的 5 次/秒查询，容量仍需验证。\n\n1. **统一缓存键**：详情用 `article:v1:{id}`；列表用 `articles:v1:{规范化查询参数}`，包含分页、排序、筛选条件。同一公共权限组共享缓存，无需按用户拆分；入口已有的访问检查继续保留。\n2. **读取流程**：先查 Redis，命中则返回；未命中就查真源，再缓存结果并返回。缓存只是副本，文章内容以真源为准。\n3. **固定过期，不续期**：命中时不延长 TTL。为守住 60 秒上限，从**本次真源读取开始时**计时，写入 Redis 时设置剩余 TTL：`60 秒 − 已耗时`；剩余时间不足就不缓存。这样不会把查询耗时额外加到陈旧窗口。若真源使用有延迟的副本，还须扣除其延迟预算。\n4. **异常处理**：Redis 超时或不可用时直接查真源；真源也失败时返回明确错误，不继续提供超过期限的旧值。其他 HTTP 或浏览器缓存也不能额外延长这 60 秒。\n5. **暂不增加组件**：先不加本地二级缓存、消息队列、定时刷新或分布式锁。并发未命中可能重复查源，先观察；只有实际造成压力时，再增加同键请求合并。\n\n验收时检查：缓存生成后立即修改或删除文章，旧内容不得超过约定的 60 秒窗口；持续命中不能续期；Redis 故障时能回源。同时记录命中率、回源 QPS、响应时间和错误率。\n\n以上是基于已知约束的设计建议，未执行容量或故障测试。",
+      "exit_code": 0,
+      "elapsed_seconds": 31.319,
+      "usage": {
+        "input_tokens": 37113,
+        "cached_input_tokens": 11392,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 747,
+        "reasoning_output_tokens": 167
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md .agents/skills/systematic-knowledge-construction/references/project-engineering.md'",
+          "exit_code": 0,
+          "output_sha256": "4a699c30535d55fa1e8f187394c225eef4b5ccbd248916a9d5bf045fc2eb3d11"
+        }
+      ]
+    },
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n补充更正：内容包含按用户授权的财务附件，权限被撤回后不得再读到旧结果，只有正文允许陈旧 60 秒。上一轮哪些判断要调整，哪些还能保留？",
+      "response": "需要调整上一轮的核心前提：**“正文可陈旧 60 秒”不能扩展到附件内容、附件列表或访问权限。**“一个公共权限组”也不足以代表财务附件的授权范围。\n\n需要调整的判断：\n\n- **不能整份响应共用一个公共缓存键。** 将正文与财务附件分开：正文可继续共享缓存；附件列表、元数据和下载内容按当前用户授权返回，避免公共缓存泄露附件名称或内容。\n- **附件不能仅靠 TTL 或撤权时删缓存保证安全。** 即使 TTL 很短，仍有撤权后继续命中的窗口；删缓存也可能失败或被并发请求重新填入旧值。最简单的做法是：每次获取附件列表、预览或下载时，都查询权威权限状态，撤权生效后立即拒绝。权限查询失败时也拒绝访问。\n- **附件先不缓存用户可见结果。** 每秒 5 次查询的规模下，优先直接鉴权并读取附件，减少失效与隔离逻辑。以后若缓存附件字节，也必须在每次返回前重新鉴权；把用户 ID 放进键里仍不能解决撤权问题。\n- **下载链路必须同样受控。** 使用需要实时鉴权的服务端下载入口，避免仍可使用的长期直链或签名链接绕过撤权检查；财务附件响应设置 `Cache-Control: private, no-store`。\n\n还能保留的判断：\n\n- **保留现有 Redis**，继续缓存正文，使用固定过期、不因命中续期的策略，并将真源读取耗时计入 60 秒预算。\n- 正文键仍可按文章 ID、规范化查询参数设计；如果正文自身也有访问限制，则返回缓存正文前同样需要鉴权。\n- Redis 故障可回源；暂不增加二级缓存、消息队列或分布式锁。监控和故障验证仍然有用，但要补充撤权测试。\n\n调整后的简单链路是：\n\n**请求 → 确认身份 → 正文走 Redis／真源；附件走当前授权检查 → 允许才读取并返回。**\n\n这里假设“撤权后不得再读到”指**撤权提交后发起的新请求不得成功**。已经下载到用户设备的副本无法通过服务端撤回；若要求连正在传输的下载也立即中断，还需要额外定义并发撤权与下载取消规则。\n\n验收重点应新增：先访问附件使相关缓存变热，再撤权，随后用原用户重试附件列表、预览和原下载地址，均不得获得附件信息或内容；权限服务故障时也不能放行。以上是方案调整，未执行验证。",
+      "exit_code": 0,
+      "elapsed_seconds": 25.322,
+      "usage": {
+        "input_tokens": 59082,
+        "cached_input_tokens": 32384,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1436,
+        "reasoning_output_tokens": 235
+      },
+      "tool_trace": []
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "artifacts": {},
+  "completed_at": "2026-10-20T00:52:15.734713+00:00"
+}

@@ -1,0 +1,16 @@
+{
+  "execution": "Fresh independent subagent; no parent conversation or intended answer supplied",
+  "status": "completed",
+  "earlier_attempt": "not_run: account usage limit; retried once after same-model CLI recovery probe succeeded",
+  "model": "Inherited host model; exact deployment not independently exposed in the agent result",
+  "source_version": "1.1.4",
+  "skill_sha256": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+  "resources_read": [
+    "SKILL.md",
+    "references/project-engineering.md",
+    "references/evidence-and-review.md"
+  ],
+  "external_services_used": false,
+  "real_system_or_performance_test": false,
+  "limitations": "A single forward example, not a separate model benchmark or human study. Workload, targets, and proposed measurements in the answer are illustrative or conditional."
+}

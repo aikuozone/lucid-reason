@@ -1,0 +1,77 @@
+{
+  "scenario": "core-07",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "f7a9d942c4e597c17ba695ea5a6db9b048a9fa20cff40acdfe58ab5945506b77",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "依据向量下降26个百分点、融合下降19个百分点，指出重排前已有退化；优先检查向量模型配套、索引及配置，并明确根因尚未确认。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "列出旧/新模型与旧/新chunk的四组组合，要求固定语料和权限并使用匹配索引；通过过滤前后相关项去向检验权限假设。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "给出单项下降、仅组合下降、旧组合仍不恢复等可区分结果；要求配套回滚模型、chunk和索引，并在原100条查询上按阶段及权限切片验收。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "明确否定现有证据足以确诊reranker，要求固定候选ID、文本、顺序及截断方式后比较重排版本，才判断是否存在独立退化。"
+          }
+        ],
+        "note": "四项均满足。排查与恢复顺序明确，四组合实验和融合检查较完整，但篇幅较长。无文件产物需要核验。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "用向量从.78跌至.52、融合从.85跌至.66说明重排前已丢失相关内容，将BM25的小幅变化降为低优先级，没有直接确诊根因。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "固定语料、标注、权限身份及其他参数，分别测试仅换embedding、仅改chunk，且要求匹配索引；补采过滤前后文档ID及原因以检验过滤假设。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "通过相关内容首次消失的位置及相同候选下重排是否退化提供可证伪信号；先整套回退，再用同一批查询验证恢复，强调端到端复测而非回滚状态。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "明确表示数据不支持reranker已坏；只有完全相同候选下仍明显退化，才归因于重排阶段。"
+          }
+        ],
+        "note": "四项均满足。包含先回退止血、补权限观测、单变量实验和固定候选重排验证，表达较精简。无文件产物需要核验。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答均实质满足全部标准。X的实验矩阵和验收细节更充分，Y更简洁；这些差异不足以形成任务完成质量上的实质偏好。"
+  },
+  "usage": {
+    "input_tokens": 15118,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 783,
+    "reasoning_output_tokens": 34
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

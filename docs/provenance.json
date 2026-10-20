@@ -1,0 +1,15 @@
+{
+  "upstream_version": "1.1.3",
+  "export_verified_on": "2026-10-20",
+  "verification": "Compared with current owned plugin release through Plugin Creator; all nine exported files matched the installed snapshot before public packaging changes.",
+  "copyright_holder": "blunt",
+  "upstream_skill_sha256": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+  "release_changes": [
+    "Public MIT repository and bilingual documentation",
+    "Remove personal contact email from public manifests",
+    "Bump distribution version to 1.1.4",
+    "Use explicit stable skill selector in the UI default prompt",
+    "Add packaging, installation, tests and evaluation evidence"
+  ],
+  "instruction_body_changed": false
+}

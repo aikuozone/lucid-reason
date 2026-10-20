@@ -1,0 +1,77 @@
+{
+  "scenario": "core-07",
+  "repetition": 3,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "8615f078776da8e4d01372c78867ec027723aa461e6267c77138c590e57a618e",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "baseline",
+    "Y": "lr"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "根据向量 .78→.52、融合 .85→.66 判断重排前已丢失相关结果，优先检查向量链路，同时明确尚不能确定根因。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "提出旧模型＋旧 chunk、新模型＋旧 chunk、旧模型＋新 chunk 的单变量对照；固定权限，并核对身份、ACL及过滤前后数量和原因以检验过滤假设。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "要求整体回滚模型、chunk及配套索引，在同一批100条查询上验证恢复；通过组合实验及相同候选集上的新旧重排比较提供可证伪信号。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "明确否定“肯定是 reranker 坏了”的归因，并指出仅凭重排 Recall@5 下降无法确诊。"
+          }
+        ],
+        "note": "四项均满足；无文件产物可核验，评价依据为回答中的具体排查与恢复步骤。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "比较各分路降幅，指出向量下降26点、融合下降19点，优先恢复上游检索，并保留多种原因的可能性。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "给出三组模型与chunk单变量实验；过滤侧固定身份重放，检查相关文档去留、拒绝原因及ACL元数据继承。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "明确只有证实相关内容被错误过滤才能归因权限；要求回滚完整配套版本，并在固定100条查询、身份和语料上检查各阶段指标及逐查询得失。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "明确不能认定 reranker 已损坏，要求相同候选集和文本上的新旧版本对照，并说明尚未实测。"
+          }
+        ],
+        "note": "四项均满足；过滤归因信号和融合后续检查更明确，但篇幅也更长。无文件产物可核验。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答均提供向量优先、完整回滚、单变量定位、权限核查和固定集回归，并拒绝未经验证的重排归因。Y的补充更细，未形成核心标准上的实质差异。"
+  },
+  "usage": {
+    "input_tokens": 14984,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 753,
+    "reasoning_output_tokens": 57
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

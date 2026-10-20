@@ -1,0 +1,67 @@
+{
+  "scenario": "decision-05",
+  "repetition": 3,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "b8bb5823fec73c1a497fa5d04bdc7d32f3f57b5358e6390b9e0cfd0f926a9134",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "baseline",
+    "Y": "lr"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "第一轮根据每小时 2 次、每次 10 条及约 100ms 耗时，建议保留同步导出，没有无依据增加队列。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "第二轮对比新旧并发、数据量和时限，并引用同步压测超时，明确说明原同步方案已无法满足上线要求。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "提出持久化任务并可靠入队后 1 秒内返回任务 ID，以消费者受控并发缓冲负载；计算 5000 万条在 600 秒内所需吞吐下界，明确完整异步链路仍须压测验证期限和容量。"
+          }
+        ],
+        "note": "三项均满足；没有需核验的文件产物。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "第一轮依据现有低负载和约 100ms 端到端耗时，明确不新增队列，并指出快速受理不能替代完成导出的要求。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "第二轮明确引用同时 500 次、每次 10 万条、新提交与完成时限，以及同步压测超时，解释改变判断的依据。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "提出可靠保存任务、1 秒内返回任务 ID、队列缓冲及后台受控并发；推导约 8.33 万条/秒的吞吐下界，要求压测验证提交时限和包含排队时间的每任务 10 分钟期限，容量不足时优化或扩容。"
+          }
+        ],
+        "note": "三项均满足；没有需核验的文件产物。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答均基于新增证据更新结论，覆盖异步提交、负载控制和容量验证。Y 对验收口径及容量不足后的措施更明确，X 更简洁；核心方案与标准满足程度没有实质差异。"
+  },
+  "usage": {
+    "input_tokens": 14823,
+    "cached_input_tokens": 11392,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 618,
+    "reasoning_output_tokens": 33
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

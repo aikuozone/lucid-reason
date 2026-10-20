@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="460" viewBox="0 0 1280 460" role="img" aria-labelledby="title desc">
+  <title id="title">lucid-reason</title>
+  <desc id="desc">Systematic understanding and reliable problem solving. Understand the mechanism. Check the evidence.</desc>
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M 32 0 L 0 0 0 32" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
+    <radialGradient id="glow"><stop stop-color="#81a997" stop-opacity=".18"/><stop offset="1" stop-color="#81a997" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1280" height="460" rx="24" fill="#14232b"/>
+  <rect width="1280" height="460" rx="24" fill="url(#grid)"/>
+  <circle cx="1060" cy="210" r="320" fill="url(#glow)"/>
+  <rect x="66" y="58" width="98" height="30" rx="15" fill="#dceba8"/>
+  <text x="115" y="78" text-anchor="middle" fill="#14232b" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="2">LR / MIT</text>
+  <text x="64" y="186" fill="#f5f5ed" font-family="Arial,sans-serif" font-size="92" font-weight="600" letter-spacing="-5">lucid-reason</text>
+  <text x="68" y="237" fill="#b6c9c4" font-family="Arial,sans-serif" font-size="23">Systematic understanding. Reliable problem solving.</text>
+  <text x="68" y="300" fill="#f5f5ed" font-family="Arial,sans-serif" font-size="27">Understand the mechanism. Check the evidence.</text>
+  <path d="M68 350 H1198" stroke="#668076" stroke-opacity=".4"/>
+  <text x="68" y="395" fill="#dceba8" font-family="Arial,sans-serif" font-size="14" letter-spacing="2">CONCEPTS</text>
+  <text x="258" y="395" fill="#9ab1a8" font-family="Arial,sans-serif" font-size="14" letter-spacing="2">CAUSAL LINKS</text>
+  <text x="495" y="395" fill="#9ab1a8" font-family="Arial,sans-serif" font-size="14" letter-spacing="2">DECISIONS</text>
+  <text x="697" y="395" fill="#9ab1a8" font-family="Arial,sans-serif" font-size="14" letter-spacing="2">VERIFICATION</text>
+  <circle cx="1085" cy="178" r="76" fill="none" stroke="#dceba8" stroke-opacity=".6"/>
+  <circle cx="1085" cy="178" r="52" fill="none" stroke="#dceba8" stroke-opacity=".22"/>
+  <path d="m1058 178 18 18 37-39" fill="none" stroke="#dceba8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

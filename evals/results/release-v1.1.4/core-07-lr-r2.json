@@ -1,0 +1,51 @@
+{
+  "scenario": "core-07",
+  "title": "有证据的 RAG 排障",
+  "group": "core",
+  "variant": "lr",
+  "repetition": 2,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-20T00:50:39.158570+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\n固定的 100 个标注查询上：BM25 Recall@20 从 .70 到 .69，向量 .78 到 .52，融合 .85 到 .66，重排后 Recall@5 从 .72 到 .48。昨天同时改了 embedding 模型与 chunk 大小，权限过滤日志缺失。用户说肯定是 reranker 坏了。请给最快的排查与恢复顺序。",
+      "response": "**不能据此认定 reranker 坏了。应先恢复匹配的 embedding、chunk 与索引版本，再隔离验证重排。** 按给定数据，向量 Recall@20 已下降 **26 个百分点**，融合下降 **19 个百分点**，问题在进入重排前就已出现；重排无法找回候选中缺失的相关内容，但自身也可能同时退化。\n\n以下是建议顺序，尚未实测；假设能取得昨天的配置或索引快照。\n\n1. **先保留现场，快速确认评测可比性。**  \n   固定这 100 个查询、语料快照、权限主体、相关性标注及各阶段候选数量，保存新旧配置和候选结果。尤其检查：chunk 改变后，标注是否仍按旧 chunk ID 匹配；应通过稳定文档 ID／证据位置核对，避免把标注映射失效当成检索下降。BM25 的 `.70→.69` 暂作参照，不能仅凭均值认定显著变化。\n\n2. **优先止血：整体切回昨天已验证的匹配版本。**  \n   一起恢复**旧查询 embedding、旧 chunk、对应旧文档向量与索引**；只回滚查询模型、继续查询新向量库，可能造成另一种不匹配。保留当前权限策略，先小流量验证再扩大。若旧索引不可用，可测试 BM25 临时兜底，但必须验证其最终 Top5，不能拿 BM25 Recall@20 直接承诺恢复效果。\n\n3. **补权限证据，与恢复工作同步推进。**  \n   为同一权限主体记录每阶段候选 ID、过滤前后数量、相关项被删除的位置及原因。权限日志缺失意味着目前无法排除误过滤，也不能确认过滤正常。**不要在生产关闭权限过滤来换召回率**；在受控离线回放中检查过滤决策，并确认 chunk 重建是否丢失或错误继承权限元数据。\n\n4. **先查向量链路，再用最小实验拆分两项变更。**  \n   快查查询端与索引端模型版本是否一致、索引是否重建完整、模型要求的前缀／归一化／距离设置是否匹配，以及文本截断和 chunk 覆盖是否异常。随后固定语料、权限与检索参数，做四组对照：\n\n   | | 旧 chunk | 新 chunk |\n   |---|---|---|\n   | 旧 embedding | 基线 | 隔离 chunk 影响 |\n   | 新 embedding | 隔离模型影响 | 当前组合 |\n\n   每组使用对应模型生成的完整文档向量。逐查询比较分路召回、融合候选覆盖；若分路恢复而融合仍差，再查融合权重、候选深度、去重与截断。\n\n5. **用完全相同的候选输入，单独验证 reranker。**  \n   固定候选 ID、文本及输入顺序，比较旧／当前重排实现和配置的 Top5，同时检查输入长度、截断、分数排序方向、超时及回退。若没有旧版本，就在同一候选集上比较重排前后的 Top5，并检查相关项排名变化。**只有相关项进入了重排输入、随后被明显排低，才有直接证据指向重排环节。** 新 chunk 导致重排输入截断，也属于需要隔离的接口影响，不能直接判为模型损坏。\n\n恢复验收应使用相同评测口径，确认各阶段指标回到旧基线附近，检查具体退化查询、权限正确性及超时情况。`.72/.85` 与 `.48/.66` 涉及不同阶段和 K，不能直接解释成 reranker 的独立效果。当前最强线索是向量链路退化，具体根因仍待上述对照确认。",
+      "exit_code": 0,
+      "elapsed_seconds": 36.607,
+      "usage": {
+        "input_tokens": 36775,
+        "cached_input_tokens": 27136,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1097,
+        "reasoning_output_tokens": 99
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md .agents/skills/systematic-knowledge-construction/references/evidence-and-review.md'",
+          "exit_code": 0,
+          "output_sha256": "87b32e0e7142b97857f1830ef79d5f91f23a0f04041e5aa5690df4c81435ce19"
+        }
+      ]
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "artifacts": {},
+  "completed_at": "2026-10-20T00:51:15.767793+00:00"
+}

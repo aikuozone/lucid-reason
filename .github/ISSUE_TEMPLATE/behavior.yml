@@ -1,0 +1,26 @@
+name: Reproducible behavior issue
+description: Report a wrong conclusion, missed constraint, or broken installation.
+body:
+  - type: input
+    id: environment
+    attributes:
+      label: Host, model, and lr version
+    validations:
+      required: true
+  - type: textarea
+    id: input
+    attributes:
+      label: Prompt and necessary context
+      description: Remove private data and credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Actual result and evidence of the problem
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior and why

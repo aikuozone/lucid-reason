@@ -1,0 +1,67 @@
+{
+  "scenario": "decision-05",
+  "repetition": 2,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "677e578bb9271709c2c8e47861d9f86a386c605b5ddef8cf3b57f4e4e50a5d4e",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "第一轮依据每小时 2 次、每次 10 条、约 100ms 小于 1 秒，建议保留同步，并指出当前未见积压或资源瓶颈。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "第二轮明确说明原建议不再适用，列出同时 500 次、每次 10 万条、新提交与完成时限，以及同步压测超时作为改变结论的证据。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "提出可靠持久化及入队后 1 秒内返回任务 ID、后台分批处理和受控并发；计算最低约 8.33 万条/秒，并要求压测验证包含排队的完成时间，明确队列本身不能保证 10 分钟达标。"
+          }
+        ],
+        "note": "三项均满足；没有文件产物需要核验。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "第一轮根据低频、小批量和约 100ms 的现有耗时建议不新增队列，并说明尚无事实支持承担队列复杂度。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "第二轮明确更新判断，通过前后对照列出新并发、单次规模、提交及后台时限和同步压测超时，说明异步化的依据。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "提出任务可靠持久化后返回 ID、队列分发、受控并发、分批读取和流式写出；计算最低约 8.33 万条/秒，并要求端到端压测确定 worker 数量及数据库、存储、带宽容量。"
+          }
+        ],
+        "note": "三项均满足；没有文件产物需要核验。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答都依据新事实合理改变结论，并覆盖异步受理、并发控制和完成时限的容量验证。Y 略简洁，X 对排队时间的说明更明确，未形成实质质量差异。"
+  },
+  "usage": {
+    "input_tokens": 14857,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 629,
+    "reasoning_output_tokens": 35
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

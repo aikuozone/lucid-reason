@@ -1,0 +1,19 @@
+{
+  "scenario": "core-01",
+  "variant": "lr",
+  "status": "blocked",
+  "blocked_reason": "usage_limit",
+  "observed_events": [
+    {
+      "type": "error",
+      "message": "You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 7:17 AM."
+    },
+    {
+      "type": "turn.failed",
+      "error": {
+        "message": "You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 7:17 AM."
+      }
+    }
+  ],
+  "record_note": "Service events retained verbatim from the original raw CLI log. The initial scenario JSON was replaced during recovery; the successful retry is in the release result."
+}

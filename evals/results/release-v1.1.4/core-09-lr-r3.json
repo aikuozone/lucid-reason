@@ -1,0 +1,65 @@
+{
+  "scenario": "core-09",
+  "title": "连续追问与前提变化",
+  "group": "core",
+  "variant": "lr",
+  "repetition": 3,
+  "test_type": "multiturn",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-20T00:53:18.255464+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\n我们的只读文章缓存可以接受最多 60 秒陈旧，只有一个公共权限组、每秒 5 次查询。提出满足这些已知约束的简单方案，先保留现有 Redis。",
+      "response": "建议保留现有 Redis，采用**按需读取、固定到期的缓存**，先不增加其他组件。\n\n假设文章来自现有数据库或接口，公共组内所有请求看到相同内容，源数据能及时反映文章更新。\n\n- **缓存键**：详情用 `article:v1:{文章ID}`；列表或搜索用规范化后的查询参数生成键，包含分页、排序和筛选条件。只有一个公共权限组，无需按用户拆分缓存。\n- **读取流程**：先查 Redis；命中且未过期就返回。未命中则查询源数据，返回结果并写入 Redis。读取命中时不续期，否则热门文章可能长期不刷新。\n- **新鲜度**：有效期最多 60 秒。严格计算时，以源数据读取开始时间为起点，写入 Redis 时扣掉查询耗时；如果源本身存在复制或同步延迟，也要从这 60 秒预算中扣除。不能直接把“写入后 TTL 60 秒”视为完整保证。\n- **失败处理**：Redis 不可用时直接查询源数据；源数据也失败时返回明确错误，不继续返回超过新鲜度上限的旧值。缓存写入失败不影响本次已成功获取的结果。\n\n每秒 5 次查询，先允许少量并发未命中直接回源，无需预先加入分布式锁、多级缓存或消息总线。前提是源服务能承受全部回源时的 5 QPS；这一点需要验证，不能仅凭请求量推定。\n\n验收重点是：文章更新后旧内容不会继续提供超过 60 秒、持续命中不会延长有效期、Redis 故障能回源，以及全未命中时源服务的延迟和错误率。以上是设计建议，尚未实测。",
+      "exit_code": 0,
+      "elapsed_seconds": 19.862,
+      "usage": {
+        "input_tokens": 37297,
+        "cached_input_tokens": 27136,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 588,
+        "reasoning_output_tokens": 80
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md .agents/skills/systematic-knowledge-construction/references/project-engineering.md'",
+          "exit_code": 0,
+          "output_sha256": "4a699c30535d55fa1e8f187394c225eef4b5ccbd248916a9d5bf045fc2eb3d11"
+        }
+      ]
+    },
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n补充更正：内容包含按用户授权的财务附件，权限被撤回后不得再读到旧结果，只有正文允许陈旧 60 秒。上一轮哪些判断要调整，哪些还能保留？",
+      "response": "需要调整的是**缓存的共享范围和权限检查方式**。保留 Redis、正文允许陈旧 60 秒的方案仍可用，但不能把财务附件和正文作为同一份公共结果缓存。\n\n上一轮这些判断要改：\n\n- **“所有请求看到相同内容”不再成立。** 公共正文可以共享缓存；附件内容、附件列表及敏感元数据，需要按用户当前授权返回。正文的公共缓存中不能混入这些受保护信息。\n- **“无需按用户拆分缓存”只适用于公共正文。** 附件可以按附件 ID 和内容版本缓存原始数据，但必须先检查当前权限，再读取或返回。仅把用户 ID 放进缓存键，无法解决撤权后旧缓存仍然存在的问题。\n- **附件权限不能套用 60 秒 TTL。** 每次附件访问都要从能反映已生效撤权的权威权限源检查授权；不能依赖可能滞后的权限副本或普通 TTL 权限缓存。权限检查失败时拒绝访问。\n- **缓存命中不能绕过鉴权。** Redis 故障后的回源路径也必须检查权限。附件下载统一经过受控服务；能在撤权后继续使用的直链或长期签名 URL 不满足要求。\n\n最简单的调整方案是：\n\n1. **正文**继续使用现有 Redis 共享缓存，沿用最多 60 秒的新鲜度预算，命中不续期。\n2. **财务附件先不做应用缓存**：每次请求检查当前授权，通过后读取附件并返回；响应设置 `Cache-Control: no-store`，避免浏览器或代理缓存后绕过服务端检查。\n3. 如果正文接口需要展示附件列表，正文缓存与附件列表分开组装，附件部分每次依据当前权限生成。\n\n还能保留的是：**现有 Redis、正文的按需缓存机制、超时回源和错误处理，以及暂不增加锁、多级缓存或消息总线的选择**。不过 5 QPS 下新增权限检查和附件回源是否可承受，仍需验证。\n\n还有一个需要明确的边界：上述方案以“**撤权成功后发起的访问必须被拒绝**”为验收口径。已经下载到用户设备的数据无法收回；如果连撤权前已开始的下载也必须立即停止，就需要额外处理活动下载的中断，单次请求开始时鉴权不足以保证。\n\n应补测一个关键场景：先成功访问附件，再撤权，随后重复访问同一地址，必须被拒绝；同时验证权限服务故障时不会返回附件。以上是调整建议，尚未实测。",
+      "exit_code": 0,
+      "elapsed_seconds": 18.895,
+      "usage": {
+        "input_tokens": 59296,
+        "cached_input_tokens": 42880,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1243,
+        "reasoning_output_tokens": 143
+      },
+      "tool_trace": []
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "artifacts": {},
+  "completed_at": "2026-10-20T00:53:57.014863+00:00"
+}

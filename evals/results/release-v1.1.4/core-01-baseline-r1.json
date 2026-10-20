@@ -1,0 +1,33 @@
+{
+  "scenario": "core-01",
+  "title": "BaseModel 的机制与边界",
+  "group": "core",
+  "variant": "baseline",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:43:11.824295+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n解释 Pydantic v2 的 BaseModel：字段声明怎样变成运行时数据模型？给一个正常输入和一个非法输入的最小例子，说明类型转换、校验错误和序列化，以及它不能保证什么。",
+      "response": "Pydantic v2 的 `BaseModel` 把**字段声明变成一套运行时的解析、校验和序列化规则**。Python 类型注解本身不会执行检查；检查由 Pydantic 完成。\n\n```python\nfrom pydantic import BaseModel, Field, ValidationError\n\nclass User(BaseModel):\n    age: int = Field(ge=0)\n\n# 正常输入：默认允许部分类型转换\nuser = User(age=\"18\")\nprint(user.age)               # 18，类型为 int\nprint(user.model_dump())      # {'age': 18}\nprint(user.model_dump_json()) # {\"age\":18}\n\n# 非法输入：无法转换成整数\ntry:\n    User(age=\"abc\")\nexcept ValidationError as exc:\n    print(exc.errors())\n```\n\n最后的错误信息会包含这些关键内容，此外可能还有错误文档链接等字段：\n\n```python\n[\n    {\n        \"type\": \"int_parsing\",\n        \"loc\": (\"age\",),\n        \"msg\": \"Input should be a valid integer, unable to parse string as an integer\",\n        \"input\": \"abc\",\n    }\n]\n```\n\n字段声明到运行时模型，大致经历三个步骤：\n\n1. **创建模型类。** Pydantic 收集类型注解、默认值和 `Field` 约束，建立字段信息，并据此生成内部的 core schema。\n2. **接收输入。** 调用 `User(...)` 或 `User.model_validate(...)` 时，由底层 `pydantic-core` 执行解析和校验。这里 `\"18\"` 被转成整数，再检查是否满足 `ge=0`；失败则抛出 `ValidationError`，提供错误位置、类型及原因。若传入 `-1`，则会触发范围约束错误。\n3. **输出数据。** `model_dump()` 生成 Python 字典；`model_dump_json()` 生成 JSON 字符串。对于日期等类型，Python 模式与 JSON 模式的输出表示可能不同。\n\n它的保证也有边界：\n\n- **默认允许转换。** 校验成功不意味着原始输入类型正确。需要拒绝 `\"18\"` 这样的输入时，可以使用严格模式，例如 `User.model_validate({\"age\": \"18\"}, strict=True)`。\n- **只检查声明的规则。** `age >= 0` 不能证明年龄真实，也不能保证用户存在、拥有权限或数据库操作一定成功。\n- **不保证对象之后始终有效。** 默认情况下，赋值不会重新校验，例如 `user.age = \"abc\"`；可配置 `validate_assignment=True`。`model_construct()` 也可以绕过常规校验。\n- **序列化不等于安全处理。** 输出 JSON 不会自动完成脱敏、权限过滤或业务审查。",
+      "exit_code": 0,
+      "elapsed_seconds": 22.672,
+      "usage": {
+        "input_tokens": 13091,
+        "cached_input_tokens": 11392,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 854,
+        "reasoning_output_tokens": 245
+      },
+      "tool_trace": []
+    }
+  ],
+  "artifact_checks": [],
+  "skill_load_observed": false,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:43:37.456696+00:00",
+  "installed_skill_files_sha256": {}
+}

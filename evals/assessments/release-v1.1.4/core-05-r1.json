@@ -1,0 +1,77 @@
+{
+  "scenario": "core-05",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "0a3b04fe45476ba0d421d3062c1d4aa1730b8cc0beb0dcf77997eba52c03860e",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "baseline",
+    "Y": "lr"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "明确将方案与目标标为待验证；把身份体系、权限信息和团队投入列为假设，并说明合成测试结果不能外推为生产效果，未宣称已有收益。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "覆盖文档分块及来源、版本、权限保存，服务端权限过滤检索，仅使用授权内容生成，以及引用校验和受控原文跳转。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "服务端负责授权，资料保留版本与权限，缓存按权限隔离并在撤权时失效，日志限制访问；权限异常时拒绝查询，证据不足或资料冲突时提供经用户确认的人工转交摘要。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "给出4人分工、12周安排和有限场景范围；禁止业务写入工具及凭证，转交由员工手动提交；验收包含越权、正确率、引用、拒答及约定负载下的P95响应时间。"
+          }
+        ],
+        "note": "四项均满足。未提供文件产物，判断依据为方案文本；验收数字均作为建议目标呈现。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "明确容量和验收数字均为建议或假设；600问/工作日给出假设及计算过程，并区分平均流量与峰值能力；收益需通过真实试点补证，未虚构实绩。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "覆盖资料导入、片段继承权限、关键词和向量检索均预过滤、候选再次鉴权、依据证据生成，以及返回前检查引用和当前权限。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "明确企业身份与源资料规则是权限依据，索引标签是副本；说明会话隔离、历史证据复核、撤权及删除处理；涵盖权限故障停止回答、模型故障降级检索和用户自行提交转交摘要。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "限定最多两个资料来源，给出4人职责和12周阶段门槛；使用只读凭据、接口白名单阻止业务写入；验收明确测试写边界、人工转交流程、答案质量、故障恢复和性能。"
+          }
+        ],
+        "note": "四项均满足。未提供文件产物；关于读取本地资料的自述不作为完成证据。方案细节较多，篇幅也更长。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份方案均完整满足四项标准。Y对权限副本、会话状态、故障降级和只读验收写得更细，X也已覆盖必要职责与路径，且表达更精简；这些差异不足以形成明确偏好。"
+  },
+  "usage": {
+    "input_tokens": 17272,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 942,
+    "reasoning_output_tokens": 145
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

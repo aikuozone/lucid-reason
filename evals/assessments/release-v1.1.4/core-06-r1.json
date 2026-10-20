@@ -1,0 +1,77 @@
+{
+  "scenario": "core-06",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "17fca4f0c967a9fff72c840713d9ec7658810d9ee1b9981c894a05cf06ff8f4f",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "baseline",
+    "Y": "lr"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "分别设计 ret 检索缓存与 thread 检查点；检索缓存可过期淘汰，会话保存状态版本、来源依赖及恢复状态，并采用独立 Redis 部署配置。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "Key 包含租户前缀，检索 scope_hash 包含用户及权限条件，另绑定权限 epoch 和完整检索参数；读取时验证身份、租户、thread 访问权和当前 epoch。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "撤权原子提交 ACL 与新 epoch，使旧 Key 不再命中；输出前再次鉴权，恢复历史状态时清理失权知识依赖，并说明发送竞态及输出闸门。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "使用 SET NX PX、退避重读防击穿，状态提交校验版本与 fencing token；权限不可确认时拒绝受保护输出，列出撤权竞态、锁过期、Redis 重启等验收场景，保留现有栈。"
+          }
+        ],
+        "note": "四项均满足。未提供实现产物或测试结果，应视为设计方案；Redis 故障时的具体运行分支比 Y 简略。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "明确区分可丢弃检索缓存和 LangGraph 恢复检查点，分别规定内容、TTL、持久化与淘汰策略。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "检索 Key 包含租户、用户、权限版本、索引版本和查询参数摘要；会话 Key 包含租户、用户及会话标识，读取时从可信身份取得隔离维度并重新过滤权限。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "通过拒绝标记、ACL 变更与权限版本推进协调撤权，命中缓存后仍实时鉴权；历史、摘要、恢复及回放同样检查，并定义撤权与发送的排序边界。"
+          },
+          {
+            "index": 4,
+            "met": true,
+            "evidence": "覆盖短租约防击穿、受限回源、会话串行及 fencing token；明确缓存故障可鉴权后回源、权限故障拒绝、状态故障停止执行，并提供竞态与故障验收场景，未更换栈。"
+          }
+        ],
+        "note": "四项均满足。未提供实现产物或测试结果；故障降级分支更明确，但篇幅也更长。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份方案均实质覆盖全部标准，隔离、撤权、会话恢复及并发控制的核心保障相当。Y 对故障分支说明更具体，X 更精简，差异不足以形成实质偏好。"
+  },
+  "usage": {
+    "input_tokens": 17571,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 849,
+    "reasoning_output_tokens": 65
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

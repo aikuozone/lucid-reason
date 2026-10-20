@@ -1,0 +1,67 @@
+{
+  "scenario": "core-09",
+  "repetition": 3,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "40125c7f538f530bed8479a67a972a5d9b0d5d2b228b1c84bc86cbee2106baaf",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "第一轮保留 Redis，按需回源、命中不续期，并从 60 秒有效期中扣除回源耗时；针对 5 QPS 暂不增加锁、多级缓存或消息总线。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "第二轮明确附件授权不能使用 60 秒 TTL，每次访问检查能反映已生效撤权的权威权限源，检查失败时拒绝访问，并排除撤权后仍有效的下载直链。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "保留 Redis 和正文最多 60 秒的共享缓存；附件先不做应用缓存，每次鉴权读取，并将附件列表与正文分开组装，设置 no-store 防止客户端缓存绕过检查。"
+          }
+        ],
+        "note": "三项均满足。回答还明确了已下载副本和进行中下载的边界；没有产物或实测证据，评价限于方案本身。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "第一轮保留 Redis，采用旁路缓存、最多 60 秒且读取不续期，明确扣除回源耗时；针对 5 QPS 暂不增加多级缓存、锁或后台刷新。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "第二轮明确 60 秒陈旧只适用于正文；附件命中缓存、预览和下载均须检查当前权限，不缓存允许结论，权限检查不可用时拒绝访问。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "继续保留 Redis 和正文共享缓存，将附件内容、列表及下载入口拆出；附件通过每次鉴权的受控接口提供，回源也不能绕过权限检查。"
+          }
+        ],
+        "note": "三项均满足，调整与保留的判断清楚。没有产物支持其工作区陈述，该陈述不计分；方案也未被实测。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答都满足全部标准，核心方案及撤权处理一致。X 补充了 no-store 和验证场景，Y 更精简；这些差异不足以形成标准达成上的实质优劣。"
+  },
+  "usage": {
+    "input_tokens": 15199,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 745,
+    "reasoning_output_tokens": 120
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

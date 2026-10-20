@@ -1,0 +1,52 @@
+{
+  "scenario": "core-03",
+  "title": "HNSW 搜索宽度",
+  "group": "core",
+  "variant": "lr",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:43:48.361411+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\nHNSW 的 efSearch 是什么？它怎样影响查询搜索和召回/延迟？说明和 M、efConstruction 的区别，以及怎样在固定数据上选择它。",
+      "response": "**efSearch 是 HNSW 查询时控制搜索广度的参数：值越大，通常搜索越充分、召回率越高，但距离计算更多、延迟更高。**它可以在已建好的索引上调整，通常不需要重建。\n\n以下按经典 HNSW 机制说明；具体库可能在队列、过滤和停止条件上有所不同。未指定实现，以下不涉及某个库的默认值，也没有实测数据。\n\n**它怎样影响搜索**\n\nHNSW 把向量组织成多层邻接图。查询先在稀疏的上层快速找到靠近目标的区域，再到底层做更充分的邻居搜索。\n\n底层搜索通常维护两类状态：\n\n- **待扩展候选集合**：下一步从哪些节点继续沿边探索。\n- **当前最好结果集合**：保留目前找到的较近节点，容量由 efSearch 控制。\n\n算法不断取出较近的候选，检查其邻居，把有希望的节点加入搜索，并更新当前最好结果。当结果集合已满，且最近的待扩展候选也比集合中最远的结果更差时，经典搜索会停止。最后从保留结果中取出最近的 `k` 个。\n\n因此，**efSearch 不是“恰好访问多少个节点”，也不是返回结果数量**。实际访问节点数、距离计算次数可以超过它。返回数量由 `k` 决定；通常应保证 `efSearch ≥ k`，有些实现会自动调整。\n\n较大的 efSearch 会保留更多备选节点，使搜索能探索更多路径，降低过早停在局部区域、漏掉真实近邻的概率。代价是更多距离计算、邻接访问和队列操作。因此：\n\n- 召回率通常上升，之后逐渐进入收益递减区间。\n- 延迟通常上升，吞吐通常下降，但不一定按比例变化。\n- 它仍是近似搜索；不能保证每条查询严格单调改善，也不能保证调大后必然达到 100% 召回。\n\n**和 M、efConstruction 的区别**\n\n| 参数 | 控制什么 | 调大后的典型代价与收益 | 是否通常需要重建 |\n|---|---|---|---|\n| `M` | 图的连接数量预算，影响每个节点保留多少邻接边；各层具体上限依实现而定 | 图更丰富，可能更容易找到好路径；索引内存和构建成本增加 | 是 |\n| `efConstruction` | 插入节点时，寻找可连接邻居的搜索广度 | 通常改善建图质量，构建更慢；最终邻接数量仍受 M 等规则限制 | 是 |\n| `efSearch` | 查询时，在已有图上搜索得多充分 | 通常提高召回，增加查询时间和临时搜索开销 | 否 |\n\n可以把三者理解为：**M 决定路网能有多少连接，efConstruction 影响修路时选路的质量，efSearch 决定查询时探索多少备选路径。**\n\n增大 efSearch 能更充分地利用现有图，但无法补上缺失的连接。因此，建图质量不足时，单靠增大它可能付出很高延迟，召回仍达不到目标。\n\n**怎样在固定数据上选择**\n\n固定数据并不能单独决定最优值，还需要固定 `k`、查询分布以及召回和延迟目标。可按下面的方法选择：\n\n1. **建立准确答案。**准备有代表性的查询集，用全量精确距离计算得到真实 top-k。使用与线上一致的距离函数、向量归一化和过滤条件。查询尽量采用独立样本；若查询来自索引数据，要明确是否排除自身。\n2. **固定索引，只扫描 efSearch。**保持 M、efConstruction、向量、硬件和实现配置不变。例如，`k=10` 时可先试 `10、20、40、80、160、320`；这只是扫描示例，不是推荐默认值。\n3. **同时测质量和成本。**对每个值计算平均：\n   \\[\n   \\mathrm{Recall@k}=\\frac{|\\text{返回 top-k}\\cap\\text{精确 top-k}|}{k}\n   \\]\n   并测延迟 p50/p95/p99、吞吐。使用相同查询集，控制预热与缓存条件，在目标并发下重复测试；重要查询类别还应分别看召回。\n4. **围绕达标区间细调。**若目标是 Recall@10 至少 95%，同时 p95 延迟不超过业务预算，就选择稳定满足两项要求的最小 efSearch，并留出适当余量；再用未参与调参的查询集确认。\n5. **无可行值时检查原因。**若召回随 efSearch 增长仍明显提高，但延迟已超预算，需要重新权衡索引或资源；若召回早早平台化，则检查 M、efConstruction、图连通性、距离定义、过滤和实现限制，不能直接断言只是 efSearch 太小。\n\n即使数据固定，改变 `k`、查询分布、过滤选择性或并发后，也应重新验证。最终要选的是**满足质量与延迟约束的实测值**，而不是一个通用常数。",
+      "exit_code": 0,
+      "elapsed_seconds": 30.968,
+      "usage": {
+        "input_tokens": 34494,
+        "cached_input_tokens": 27136,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1358,
+        "reasoning_output_tokens": 67
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md'",
+          "exit_code": 0,
+          "output_sha256": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152"
+        }
+      ]
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:44:22.275553+00:00",
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "source_hash_verification": "Observed installed files after run; workspaces retained unchanged."
+}

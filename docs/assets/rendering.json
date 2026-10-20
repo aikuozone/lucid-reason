@@ -1,0 +1,22 @@
+{
+  "renderer": "Playwright 1.48.0",
+  "browser": "130.0.6723.31",
+  "viewport": {
+    "width": 1200,
+    "height": 900
+  },
+  "device_scale_factor": 1.5,
+  "requested_cjk_font": "Noto Sans CJK SC",
+  "description": "Local HTML renderings of actual CLI response excerpts; not screenshots of a chat product UI.",
+  "sources": {
+    "evals/results/release-v1.1.4/core-01-lr-r1.json": "68143004b397136d1858db09cfcb527d4b866e47f40bc98bc7194a1e3570a62f",
+    "evals/results/release-v1.1.4/core-07-lr-r1.json": "2499b49ca3d748a8f6023fc2f24bb8b246b631d1d521ab4d0c0f420436416686",
+    "evals/results/release-v1.1.4/core-09-lr-r1.json": "ea6f7cd38cb8d8706eb65e8539f91113a38f3e647271f1d6e9647ea85e755599"
+  },
+  "screenshots": {
+    "showcase.png": "dfd415cdb6101b078dea3aa7d808e2c1b6c78b1573df9a5bc1637361b767eb08",
+    "concept.png": "4d8a53878d4962dd79cbab14d7254c89638987509dd485ac82569922a7ab91fc",
+    "diagnosis.png": "e747839406e47c9dbb04ea7a8735ef9385d07d700feacf682c05b50ca097d85e",
+    "continuity.png": "6f68b4513524f65d267ecbd6a212dd1fc9bd1b82f9cb8c5e402cf990265b5cf0"
+  }
+}

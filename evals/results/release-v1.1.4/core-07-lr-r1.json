@@ -1,0 +1,52 @@
+{
+  "scenario": "core-07",
+  "title": "有证据的 RAG 排障",
+  "group": "core",
+  "variant": "lr",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:46:07.073703+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\n固定的 100 个标注查询上：BM25 Recall@20 从 .70 到 .69，向量 .78 到 .52，融合 .85 到 .66，重排后 Recall@5 从 .72 到 .48。昨天同时改了 embedding 模型与 chunk 大小，权限过滤日志缺失。用户说肯定是 reranker 坏了。请给最快的排查与恢复顺序。",
+      "response": "**现有证据不支持“肯定是 reranker 坏了”。**向量 Recall@20 下降 **26 个百分点**，融合下降 **19 个百分点**，说明重排之前已经有明显退化；reranker 无法找回未进入候选集的相关内容。它是否另有问题，需要固定候选集才能判断。\n\n以下假设这些指标来自对应阶段，且评测口径一致；目前没有日志或实测，根因仍未确认。\n\n最快顺序是：\n\n1. **冻结现场，快速确认指标可比。**  \n   保存当前配置、索引版本和这 100 条查询的逐条结果。固定语料快照、权限主体、标注及候选深度。尤其检查 chunk 改动后，标注是否仍指向旧 chunk ID：应通过稳定文档 ID／原文位置映射相关内容，避免把标注失配当成召回下降。BM25 的 1 个百分点波动暂不作为主因证据。\n\n2. **若业务正在受损，先恢复上一套完整可用版本。**  \n   配套恢复旧 embedding、旧 chunk 对应的索引，以及查询端编码配置；不能只切回模型却继续查询新索引。保留现场后即可恢复，不必等根因分析结束。若旧索引不可用，可先评估 BM25 单路降级，但需验证效果，不能假定能恢复原融合水平。**恢复期间保持权限校验。**\n\n3. **补齐权限证据，沿链路找“首次丢失”。**  \n   对同一主体重放，记录各路召回、融合、权限过滤前后、重排输入及输出的候选 ID、数量和相关项去向；过滤在哪发生，就在哪采集证据。  \n   - 相关项过滤前存在、过滤后消失：核对 ACL 元数据、主体和规则；合法拒绝须从该主体可见的相关集合核算指标。  \n   - 过滤前就缺失：优先查索引与召回。  \n   \n   缺日志意味着权限因素**尚未排除**，不能推断它正常，也不能通过关闭线上鉴权验证。\n\n4. **优先查向量链路，再隔离两项同时变更。**  \n   先做成本最低的检查：查询／文档是否使用配套模型和版本，维度、归一化、距离度量是否一致，索引是否完整重建、别名是否指错或混入旧向量。随后在同一语料和权限条件下比较：\n\n   | 组合 | 用途 |\n   |---|---|\n   | 旧模型＋旧 chunk | 验证基线能否复现 |\n   | 新模型＋旧 chunk | 隔离模型影响 |\n   | 旧模型＋新 chunk | 隔离切块影响 |\n   | 新模型＋新 chunk | 复现当前退化及交互影响 |\n\n   每组使用对应重建的文档向量。单项就下降，追查该项；只有组合下降，再查交互。旧组合也不恢复，则继续查共同的数据、权限或评测变化。\n\n5. **候选召回恢复后，检查融合，再验 reranker。**  \n   两路正常而融合仍差，检查候选深度、去重／文档映射、融合权重与分数尺度；embedding 改动可能改变分数分布。  \n   对 reranker，固定**完全相同的候选 ID、文本、顺序和截断方式**，比较当前实现与此前可用版本／配置的 Recall@5，同时查看输入候选覆盖率。只有相同输入下排序退化，才支持重排环节有独立故障。不能用 `.48/.66` 与 `.72/.85` 的比值直接归因，因为候选集和 K 都不同。\n\n6. **用同一批查询验收恢复。**  \n   各阶段应回到原基线附近，并检查逐查询损失、权限切片和越权返回；容差须事先约定。恢复后每次只上线一项变更，保留可回滚的完整版本。\n\n**执行优先级：保留证据 → 配套回滚止血 → 补权限观测 → 查向量配置与模型／切块 → 查融合 → 固定候选验证重排。**",
+      "exit_code": 0,
+      "elapsed_seconds": 36.857,
+      "usage": {
+        "input_tokens": 36761,
+        "cached_input_tokens": 27136,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1148,
+        "reasoning_output_tokens": 66
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md .agents/skills/systematic-knowledge-construction/references/evidence-and-review.md'",
+          "exit_code": 0,
+          "output_sha256": "87b32e0e7142b97857f1830ef79d5f91f23a0f04041e5aa5690df4c81435ce19"
+        }
+      ]
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:46:46.890455+00:00",
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "source_hash_verification": "Observed installed files after run; workspaces retained unchanged."
+}

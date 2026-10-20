@@ -1,0 +1,7 @@
+interface:
+  display_name: "lucid-reason"
+  short_description: "lr · 系统性理解、工程决策、故障诊断与可靠审查"
+  default_prompt: "使用 $systematic-knowledge-construction（lucid-reason，简称 lr）的系统性理解与可靠问题解决原则：讲清必要概念、机制、因果、关联和边界；在需要时连接工程实践与证据核验，表达清晰不冗余，不强制固定模板。"
+policy:
+  allow_implicit_invocation: true
+

@@ -1,0 +1,67 @@
+{
+  "scenario": "core-09",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "ba40e381f2d1192a74e8231121b60d0ea6ff15706d5506620a45ac4ffdb2b2a3",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "baseline",
+    "Y": "lr"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "保留 Redis，采用 Cache Aside 和固定 60 秒 TTL，命中不续期，并扣除回源耗时；针对 5 QPS 接受少量并发回源，不增加复杂组件。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "明确指出附件不能依赖 TTL，每次返回附件信息或内容前必须检查当前授权，无法确认授权时拒绝访问；用户 ID 缓存键不足以解决撤权。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "继续共享缓存正文，附件每次实时鉴权后读取缓存或源文件；要求拆分混有附件信息的响应，并防止下载链接绕过授权。"
+          }
+        ],
+        "note": "三项均满足；提供的是设计方案，没有文件产物或实测证据。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "保留 Redis，按需缓存查询结果，按回源开始时间限制 60 秒有效期，命中不续期；5 QPS 下允许少量并发回源，无需额外缓存层或消息队列。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "明确权限撤回不能等待 TTL；附件列表、敏感元数据和下载内容每次都检查权威权限源，不能使用旧授权结果兜底。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "保留正文 60 秒缓存，将附件读取与正文分开，按当前权限组装响应；通过清理或更换键空间停用旧完整响应，并检查旧下载链接及客户端、代理缓存。"
+          }
+        ],
+        "note": "三项均满足；明确说明未执行系统验证，没有文件产物可检查。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答都满足全部标准，并明确将撤权要求理解为撤权完成后的新请求必须拒绝。Y 多列出旧缓存切换及客户端缓存检查，X 也覆盖了实时鉴权、响应拆分和下载入口；这些补充未形成标准满足程度上的实质差异。"
+  },
+  "usage": {
+    "input_tokens": 15194,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 629,
+    "reasoning_output_tokens": 41
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

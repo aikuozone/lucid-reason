@@ -1,0 +1,26 @@
+{
+  "cli_version": "codex-cli 0.160.0",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "plugins_and_apps_disabled": true,
+  "isolated_workspaces": true,
+  "source_version": "1.1.4",
+  "skill_sha256": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+  "sampling_seed": "not exposed",
+  "temperature": "CLI default, not exposed",
+  "run_id": "resume-check-2026-10-20",
+  "limitations": [
+    "Uses one model and one local CLI host, not a cross-host benchmark",
+    "Natural-language implicit activation and plugin marketplace UI are not tested",
+    "No live web or external connectors are available",
+    "Additional transfer scenarios were authored by the publisher; they are not a sealed independent benchmark"
+  ],
+  "skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  }
+}

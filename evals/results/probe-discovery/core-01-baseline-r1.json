@@ -1,0 +1,32 @@
+{
+  "scenario": "core-01",
+  "title": "BaseModel 的机制与边界",
+  "group": "core",
+  "variant": "baseline",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:40:16.151901+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n解释 Pydantic v2 的 BaseModel：字段声明怎样变成运行时数据模型？给一个正常输入和一个非法输入的最小例子，说明类型转换、校验错误和序列化，以及它不能保证什么。",
+      "response": "Pydantic v2 的 `BaseModel` 把**字段的类型注解和约束，变成运行时的解析、校验和序列化规则**。普通 Python 类型注解本身不会执行这些检查。\n\n例如：\n\n```python\nfrom pydantic import BaseModel, Field, ValidationError\n\nclass Order(BaseModel):\n    quantity: int = Field(gt=0)\n\n# 正常输入：默认采用宽松模式，允许部分类型转换\norder = Order(quantity=\"2\")\nprint(order.quantity)         # 2\nprint(type(order.quantity))   # <class 'int'>\n\n# 序列化\nprint(order.model_dump())       # {'quantity': 2}\nprint(order.model_dump_json())  # {\"quantity\":2}\n\n# 非法输入\ntry:\n    Order(quantity=\"abc\")\nexcept ValidationError as exc:\n    for error in exc.errors():\n        print(error[\"loc\"], error[\"type\"])\n        # ('quantity',) int_parsing\n```\n\n这里的输出是按规则说明的预期结果，未在当前环境执行。\n\n字段声明大致经过以下过程：\n\n1. **定义类时**：Pydantic 收集类型注解、默认值和 `Field` 约束，形成字段信息，可通过 `Order.model_fields` 查看。\n2. **构建模型规则**：把字段信息转换为内部的 Core Schema，交给主要由 Rust 实现的 `pydantic-core`，建立校验器和序列化器。部分构建也可以延迟进行。\n3. **接收输入时**：调用 `Order(...)` 或 `Order.model_validate(...)`，按规则解析输入。上例先把 `\"2\"` 转成整数，再检查它是否大于零，成功后生成实例。\n\n因此，**校验针对的是解析后的值，不一定要求原始输入已经具有目标类型**。`\"abc\"` 无法转成整数，会产生 `int_parsing` 错误；`quantity=0` 虽然是整数，也会因不满足 `gt=0` 而失败。错误中包含字段位置、错误类型及相关输入；校验失败时不会返回一个成功构造的模型。\n\n`model_dump()` 生成 Python 字典，其中可能仍包含 Python 对象；`model_dump_json()` 生成 JSON 字符串，会使用相应的 JSON 序列化规则。\n\n它不能保证：\n\n- **原始输入类型完全正确**：默认允许部分转换；需要时可启用严格模式。\n- **数据在业务上真实或合理**：库存是否充足、用户是否有权限，仍需业务逻辑检查。\n- **实例永远有效**：默认不会校验后续字段赋值；`model_construct()` 也可以绕过校验。默认值通常也需要显式开启校验。\n- **未知字段一定被拒绝**：默认会忽略额外字段；需要拒绝时可配置 `extra=\"forbid\"`。\n\n它提供的是按所声明规则执行的数据边界检查，而不是对数据真实性或程序整体正确性的证明。",
+      "exit_code": 0,
+      "elapsed_seconds": 20.558,
+      "usage": {
+        "input_tokens": 13091,
+        "cached_input_tokens": 6144,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 835,
+        "reasoning_output_tokens": 171
+      },
+      "tool_trace": []
+    }
+  ],
+  "artifact_checks": [],
+  "skill_load_observed": false,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:40:39.665658+00:00"
+}

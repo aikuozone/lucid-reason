@@ -1,0 +1,33 @@
+{
+  "scenario": "core-04",
+  "title": "Transformer 主干",
+  "group": "core",
+  "variant": "baseline",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:44:16.579696+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n系统讲解 Transformer。请把主要信息流、注意力机制、位置信息、残差与前馈层、训练和自回归推理的关系串起来，解释必要的 Q/K/V 维度与 mask。",
+      "response": "Transformer 可以理解为：**先把 token 变成向量，再让每个位置读取相关上下文，经过多层加工，最后输出预测。**注意力负责在位置之间交换信息，前馈层负责加工每个位置的特征；位置信息说明顺序，mask 规定哪些信息可以读取，残差连接帮助信息和梯度穿过深层网络。\n\n下面以现代语言模型常见的 **decoder-only Transformer** 为主线，再补充原始编码器—解码器结构。为方便说明，假设每层使用标准多头注意力，省略 dropout 等细节。\n\n**从 token 到一层 Transformer**\n\n输入文字首先被分词为 token ID，再通过 embedding 查表得到向量：\n\n\\[\nX\\in\\mathbb{R}^{B\\times T\\times d_{\\text{model}}}\n\\]\n\n其中 \\(B\\) 是批大小，\\(T\\) 是序列长度，\\(d_{\\text{model}}\\) 是模型的隐藏维度。每个位置的向量最初主要表达 token 身份；经过多层处理后，它逐渐融合上下文。\n\n常见的 Pre-Norm 层可以写成：\n\n\\[\nU=X+\\operatorname{Attention}(\\operatorname{Norm}(X))\n\\]\n\n\\[\nY=U+\\operatorname{FFN}(\\operatorname{Norm}(U))\n\\]\n\n所以一层包含两步：先利用注意力读取其他位置，再用前馈网络加工每个位置。两步都有残差连接。多层堆叠后，最后的隐藏状态经过归一化和词表投影，变成每个候选 token 的分数，即 logits。\n\n**注意力如何读取上下文**\n\n对某一注意力头，输入分别经过三个可学习的线性投影：\n\n\\[\nQ=XW_Q,\\qquad K=XW_K,\\qquad V=XW_V\n\\]\n\n直观上：\n\n- **Q，Query**：当前位置要查找什么。\n- **K，Key**：各位置提供什么匹配线索。\n- **V，Value**：匹配后实际读取的内容。\n\nQ/K/V 是训练学到的向量表示，并没有固定、人工指定的语义。\n\n假设有 \\(H\\) 个头，每个头维度为 \\(d_h=d_{\\text{model}}/H\\)。标准实现拆分后的形状为：\n\n\\[\nQ,K,V\\in\\mathbb{R}^{B\\times H\\times T\\times d_h}\n\\]\n\n在单个头中，位置 \\(i\\) 对位置 \\(j\\) 的注意力分数为：\n\n\\[\ns_{ij}=\\frac{q_i^\\top k_j}{\\sqrt{d_h}}+M_{ij}\n\\]\n\n然后对所有可读取的 \\(j\\) 做 softmax，并加权汇总 V：\n\n\\[\na_{ij}=\\frac{\\exp(s_{ij})}{\\sum_{j'}\\exp(s_{ij'})},\n\\qquad\no_i=\\sum_j a_{ij}v_j\n\\]\n\n合起来就是：\n\n\\[\n\\operatorname{Attention}(Q,K,V)\n=\n\\operatorname{softmax}\n\\left(\\frac{QK^\\top}{\\sqrt{d_h}}+M\\right)V\n\\]\n\n维度流动是：\n\n\\[\n\\underbrace{QK^\\top}_{B\\times H\\times T\\times T}\n\\;\\longrightarrow\\;\n\\underbrace{AV}_{B\\times H\\times T\\times d_h}\n\\]\n\nsoftmax 沿着 **Key 所在的维度**计算：对每一个 Query，决定它把多少权重分配给各个 Key。除以 \\(\\sqrt{d_h}\\)，是为了控制点积分数的尺度，避免维度增大时 softmax 容易过度饱和。\n\n多个头各自学习投影、各自读取信息，再拼接并经过输出投影：\n\n\\[\nO=\\operatorname{Concat}(O_1,\\ldots,O_H)W_O\n\\in\\mathbb{R}^{B\\times T\\times d_{\\text{model}}}\n\\]\n\n这样，注意力输出可以直接参与残差相加。不同头可以学到不同的信息关系，但并不保证每个头都有明确的人类可解释功能。\n\n**mask 决定信息可以往哪里流**\n\nmask 通常加在 softmax 之前：允许读取的位置加 \\(0\\)，禁止读取的位置加 \\(-\\infty\\)，使后者的注意力权重变为 \\(0\\)。\n\n两种常见 mask 是：\n\n| mask | 作用 |\n|---|---|\n| Padding mask | 屏蔽为对齐序列长度而补入的无效 token |\n| Causal mask | 位置 \\(i\\) 只能读取 \\(j\\le i\\) 的位置，阻止读取未来 |\n\n以长度为 4 的因果注意力为例，行是 Query，列是 Key：\n\n\\[\nM=\n\\begin{bmatrix}\n0&-\\infty&-\\infty&-\\infty\\\\\n0&0&-\\infty&-\\infty\\\\\n0&0&0&-\\infty\\\\\n0&0&0&0\n\\end{bmatrix}\n\\]\n\n这里允许读取当前位置，因为位置 \\(i\\) 的输出通常用于预测**下一个 token**；当前位置的输入 token 已经是已知信息。\n\n**位置信息与 mask 各有作用**\n\n单纯的自注意力没有内建的先后顺序：如果同时重排输入和相应的 mask，输出也会跟着重排。模型因此需要额外的机制表示位置。\n\n常见方法包括：\n\n- **绝对位置编码**：把位置向量加到 token embedding 上，可以采用固定正弦函数或可学习向量。\n- **相对位置偏置**：根据两个位置之间的距离，调整注意力分数。\n- **RoPE**：根据位置旋转 Q、K 的部分维度，使点积包含相对位置关系。\n\n例如，“甲帮助乙”和“乙帮助甲”包含相同的词，但词序改变了关系。位置信息帮助模型表达这种区别。\n\n**位置信息表达位置关系；causal mask 限制可访问范围。**因果 mask 虽然也带来方向性，但不能简单当作位置编码的替代品。\n\n**残差、归一化与前馈层如何接上注意力**\n\n注意力将上下文信息汇入每个位置后，FFN 对每个位置独立应用同一组参数。典型形式是：\n\n\\[\n\\operatorname{FFN}(x)=W_2\\,\\sigma(W_1x+b_1)+b_2\n\\]\n\n维度一般先扩展，再压回：\n\n\\[\nd_{\\text{model}}\\rightarrow d_{\\text{ff}}\\rightarrow d_{\\text{model}}\n\\]\n\n现代模型也常使用 SwiGLU 等门控变体。\n\n注意力让不同位置交换信息；FFN 则对每个位置已经汇集的特征做非线性加工。所谓“逐位置”，不意味着它看不到上下文——它的输入已经经过注意力融合。\n\n残差连接 \\(x+f(x)\\) 让子层在已有表示上添加更新，并提供较直接的梯度传播路径。归一化则帮助控制激活尺度、稳定训练。原始 Transformer 使用 Post-Norm，许多现代模型使用上面展示的 Pre-Norm，也有其他变体。\n\n经过多层交替处理，一个位置就能反复“读取上下文—加工特征”，形成越来越复杂的表示。\n\n**为什么训练可以并行，而生成必须逐步进行**\n\n自回归语言模型把序列概率分解为：\n\n\\[\np(x_1,\\ldots,x_T)\n=\n\\prod_{t=1}^{T}p(x_t\\mid x_{<t})\n\\]\n\n训练通常采用 teacher forcing：使用真实前缀预测真实的下一个 token。例如：\n\n```text\n输入： [BOS]  我   喜欢  苹果\n目标：  我    喜欢  苹果  [EOS]\n```\n\n输入和目标错开一位，再计算各位置的交叉熵：\n\n\\[\n\\mathcal L=-\\sum_t\\log p_\\theta(x_t\\mid x_{<t})\n\\]\n\n**训练时，整条真实序列已经给定，因此可以一次计算所有位置；causal mask 保证每个位置仍然只能依赖自己的前缀。**即使未来 token 的表示存在于同一个计算张量里，它们也无法通过被屏蔽的注意力路径泄露给当前位置。\n\n推理时，下一个 token 尚未确定，所以必须：\n\n1. 处理已有前缀，得到下一个 token 的概率分布。\n2. 通过贪心或采样等方式选出一个 token。\n3. 把它追加到前缀，继续预测。\n\n这里逐步发生的是 **token 的生成**，不是重新训练模型；常规推理不会更新模型参数。\n\n为了减少重复计算，推理通常使用 **KV cache**。在标准因果 Transformer 中，追加新 token 不会改变旧位置的表示，因此每层已算出的 K、V 可以缓存。新 token 只需计算自己的 Q/K/V，再让自己的 Q 读取缓存中的 K/V。\n\n此时单步注意力的典型维度是：\n\n\\[\nQ:\\ B\\times H\\times1\\times d_h\n\\]\n\n\\[\nK,V:\\ B\\times H\\times T_{\\text{cache}}\\times d_h\n\\]\n\n注意力权重则是 \\(B\\times H\\times1\\times T_{\\text{cache}}\\)。缓存随序列增长，位置编码也必须沿用正确的位置编号。\n\n推理中的首次整段提示词处理通常称为 **prefill**，可以并行计算提示词各位置；随后逐 token 生成的阶段称为 **decode**。\n\n**原始编码器—解码器结构放在哪里**\n\n原始 Transformer 用于序列到序列任务，其信息流是：\n\n\\[\n\\text{源序列}\n\\rightarrow\\text{编码器}\n\\rightarrow\\text{解码器的交叉注意力}\n\\rightarrow\\text{目标序列预测}\n\\]\n\n编码器通常使用双向自注意力，让源序列各位置互相读取。解码器先用因果自注意力读取已知目标前缀，再用交叉注意力读取编码器输出。\n\n交叉注意力中，**Q 来自解码器，K/V 来自编码器**。源长度为 \\(S\\)、目标长度为 \\(T\\) 时，注意力权重形状为：\n\n\\[\nB\\times H\\times T\\times S\n\\]\n\n它通常屏蔽源序列的 padding，而不对源位置使用因果限制。decoder-only 语言模型则没有这条独立的编码器信息流：提示词和生成内容处在同一条因果序列中。",
+      "exit_code": 0,
+      "elapsed_seconds": 49.302,
+      "usage": {
+        "input_tokens": 13091,
+        "cached_input_tokens": 11392,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2535,
+        "reasoning_output_tokens": 120
+      },
+      "tool_trace": []
+    }
+  ],
+  "artifact_checks": [],
+  "skill_load_observed": false,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:45:08.844857+00:00",
+  "installed_skill_files_sha256": {}
+}

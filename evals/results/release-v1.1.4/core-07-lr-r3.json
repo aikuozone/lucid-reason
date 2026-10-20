@@ -1,0 +1,51 @@
+{
+  "scenario": "core-07",
+  "title": "有证据的 RAG 排障",
+  "group": "core",
+  "variant": "lr",
+  "repetition": 3,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-20T00:52:35.605198+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\n固定的 100 个标注查询上：BM25 Recall@20 从 .70 到 .69，向量 .78 到 .52，融合 .85 到 .66，重排后 Recall@5 从 .72 到 .48。昨天同时改了 embedding 模型与 chunk 大小，权限过滤日志缺失。用户说肯定是 reranker 坏了。请给最快的排查与恢复顺序。",
+      "response": "**不能认定 reranker 坏了。优先恢复上游检索，再隔离重排。** 按你给的数据，BM25 降了 1 个百分点，向量降了 26 点，融合降了 19 点；重排前已明显丢失相关候选，reranker 无法找回未进入候选集的内容。但它也可能同时有问题。\n\n以下是假设存在昨日变更前的可用版本、索引快照；尚未实测。\n\n1. **冻结变更、保留证据，同时核对评测口径。**  \n   保存新旧配置、模型与索引版本、100 条查询的逐条结果。确认语料快照、权限主体、相关性标注及指标算法一致。尤其检查 chunk 改动后，标注是否仍指向旧 chunk ID：应通过文档 ID／证据位置映射比较，避免把 ID 变化误判为召回下降。\n\n2. **最快恢复：整体切回上一套已验证的 embedding、chunk 和对应索引。**  \n   查询端模型与文档向量必须配套，不能只回滚模型、继续使用新索引。先验证再切流，保留当前版本供重放。若旧索引不可用，可临时使用经验证的 BM25 路径降级；其当前 `.69` 不能保证最终 Recall@5 恢复。\n\n3. **权限检查与恢复并行，不能等到最后，也不能绕过过滤。**  \n   日志缺失意味着权限过滤仍是未排除的原因。补采每条查询在实际过滤位置的候选数量、相关文档去留、拒绝原因及权限版本；固定同一身份重放。检查新 chunk 是否漏继承 ACL／租户元数据。只有证实相关内容在过滤阶段被错误删除，才能归因于权限；不能关闭生产鉴权来“恢复召回”。\n\n4. **定位向量回退：先查配套错误，再做单变量实验。**  \n   先核查查询／文档 embedding 版本、维度、归一化、距离函数、索引覆盖及是否混入旧向量。这些检查通常比重建更快。随后固定语料、权限与检索参数，对比：\n   - 旧模型＋旧 chunk：复现基线；\n   - 新模型＋旧 chunk：隔离模型影响；\n   - 旧模型＋新 chunk：隔离切块影响。  \n   \n   各组合使用匹配的文档向量和索引；必要时补新＋新组合判断交互。如果配套修正后恢复，便不能据此认定新模型质量差。\n\n5. **沿候选链查融合，最后独立检验 reranker。**  \n   保存分路、融合及重排输入的候选 ID、文本、分数与名次，找相关证据首次消失的位置。若分路恢复而融合仍低，再查候选深度、去重、ID 映射、融合权重及分数尺度。  \n   检验 reranker 时，给新旧重排版本输入**完全相同的候选集和文本**，比较 Recall@5、排序与截断情况；只有这样才能判断它是否有独立退化。不能直接用 `.48/.66` 与 `.72/.85` 的比值判断重排能力。\n\n**恢复验收：**在同一套有效标注、身份和语料上重放全部 100 条查询，确认各阶段指标恢复至旧基线附近，并检查逐查询得失及权限正确性。BM25 的 1 点变化暂不作为主攻方向，也不能仅凭均值断言它完全正常。",
+      "exit_code": 0,
+      "elapsed_seconds": 21.451,
+      "usage": {
+        "input_tokens": 36766,
+        "cached_input_tokens": 27136,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 986,
+        "reasoning_output_tokens": 59
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md .agents/skills/systematic-knowledge-construction/references/evidence-and-review.md'",
+          "exit_code": 0,
+          "output_sha256": "87b32e0e7142b97857f1830ef79d5f91f23a0f04041e5aa5690df4c81435ce19"
+        }
+      ]
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "artifacts": {},
+  "completed_at": "2026-10-20T00:52:57.058575+00:00"
+}

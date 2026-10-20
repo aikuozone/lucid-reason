@@ -1,0 +1,53 @@
+{
+  "scenario": "core-01",
+  "title": "BaseModel 的机制与边界",
+  "group": "core",
+  "variant": "lr",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:40:16.164148+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\n解释 Pydantic v2 的 BaseModel：字段声明怎样变成运行时数据模型？给一个正常输入和一个非法输入的最小例子，说明类型转换、校验错误和序列化，以及它不能保证什么。",
+      "response": "**Pydantic v2 的 `BaseModel` 把字段声明变成一套运行时的数据处理规则：接收输入，按规则转换和校验，成功后生成模型实例，并支持序列化。** 普通 Python 类型注解本身不会自动执行这些检查。\n\n下面按 Pydantic v2 的默认行为解释。本地 `python3` 未安装 Pydantic，因此示例未实测，输出标为预期；全程未联网。\n\n**字段声明怎样生效**\n\n从声明到实例，大致经过这条链：\n\n`类型注解、Field 约束、默认值 → 内部规则 → 校验输入 → 模型实例 → 序列化`\n\n1. 定义 `BaseModel` 子类时，Pydantic 的类构建机制收集字段信息。例如，`age: int = Field(ge=0)` 表示字段需要整数，且值不能小于零；这里没有默认值，因此必须提供。\n2. Pydantic 据此生成内部的 **core schema**，即描述转换、校验和序列化方式的规则。它不是用于对外描述数据格式的 JSON Schema。\n3. 调用 `User(...)` 或 `User.model_validate(...)` 时，底层 `pydantic-core`（主要由 Rust 实现）执行这些规则。默认宽松模式允许部分类型转换；转换后还要检查约束。成功返回实例，失败抛出 `ValidationError`。\n4. 实例可以通过 `model_dump()` 导出 Python 数据，或通过 `model_dump_json()` 导出 JSON 字符串。\n\n**最小例子**\n\n```python\nfrom pydantic import BaseModel, Field, ValidationError\n\nclass User(BaseModel):\n    id: int\n    age: int = Field(ge=0)\n\n# 正常输入：默认模式允许数字字符串转换成整数\nuser = User.model_validate({\"id\": \"123\", \"age\": \"18\"})\n\nprint(user.id, type(user.id).__name__)\nprint(user.model_dump())\nprint(user.model_dump_json())\n\n# 非法输入：一个无法转换，一个违反数值约束\ntry:\n    User.model_validate({\"id\": \"abc\", \"age\": -1})\nexcept ValidationError as exc:\n    for error in exc.errors():\n        print(error[\"loc\"], error[\"type\"])\n```\n\n预期输出：\n\n```text\n123 int\n{'id': 123, 'age': 18}\n{\"id\":123,\"age\":18}\n('id',) int_parsing\n('age',) greater_than_equal\n```\n\n这里有三个关键点：\n\n- `\"123\"` 被接受并转换成 `123`，说明**校验通过不等于原始输入已经具有声明的类型**。若希望拒绝这种转换，可使用严格模式，例如 `model_validate(data, strict=True)`。\n- 非法输入会产生结构化错误：`loc` 指出字段位置，`type` 指出错误类别。一次校验可以报告多个字段错误，这次调用不会返回有效模型实例。\n- `model_dump()` 返回字典；`model_dump_json()` 返回字符串。序列化导出的是模型当前的数据，而不是保留原始输入中的 `\"123\"`。\n\n**它不能保证什么**\n\n它提供的是**已声明规则、当前配置和实际校验路径范围内的保证**，不能推导出更强的结论：\n\n- **不能证明事实或业务正确。** `age=200` 满足上述规则；`id=123` 也不意味着该用户真实存在或当前调用者有权访问。业务约束需要补充，事实与权限通常还需要外部检查。\n- **不能保证实例永远有效。** 默认赋值不重新校验，例如之后执行 `user.age = -1` 可以破坏约束；需要时可配置 `validate_assignment=True`。`model_construct()` 则可直接绕过常规校验。\n- **不会自动检查所有未声明内容。** 默认忽略额外输入字段；需要拒绝时配置 `extra=\"forbid\"`。默认值通常也不会自动校验，需要时启用 `validate_default=True`。\n- **序列化不等于重新校验或隐私保护。** 导出 JSON 不会自动验证数据库事实，也不会自动删除敏感字段；这些规则仍须明确设计。",
+      "exit_code": 0,
+      "elapsed_seconds": 32.576,
+      "usage": {
+        "input_tokens": 53335,
+        "cached_input_tokens": 38528,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1277,
+        "reasoning_output_tokens": 167
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md'",
+          "exit_code": 0,
+          "output_sha256": "b38613b090a13ecb18c53a5e537bf6cc39fe33b748b92edf3e3f4532085ab964"
+        },
+        {
+          "command": "/bin/bash -lc 'python -c \"import pydantic; print(pydantic.__version__)\"'",
+          "exit_code": 127,
+          "output_sha256": "d5fc4556bcd9138a80d56c28419f6c3758f29e88db2ec00a0a06d1b8335d06ea"
+        },
+        {
+          "command": "/bin/bash -lc 'python3 -c \"import pydantic; print(pydantic.__version__)\"'",
+          "exit_code": 1,
+          "output_sha256": "d3e3c710737c29385dfeef74b7c9327770c84c996434683d3cfb87b99313179f"
+        }
+      ]
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:40:51.696810+00:00"
+}

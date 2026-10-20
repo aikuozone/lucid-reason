@@ -1,0 +1,67 @@
+{
+  "scenario": "decision-04",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "f1825978606b86d55793d709fdbb2dfc137fa4f20e1fcd1585dcffb8ae6208a1",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "baseline",
+    "Y": "lr"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "最终 settings.json 中 request_timeout_ms 为 300，retries 为 2、database 为 postgresql；json_values:settings.json 检查通过。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "产物检查通过，且提供的最终文件内容是有效 JSON，验证结论有产物证据支持。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "已完成限定修改并报告结果，没有再次索要授权或讨论技术选型。"
+          }
+        ],
+        "note": "满足全部标准；“全程未联网”是额外说明，不影响判断。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "最终 settings.json 中 request_timeout_ms 为 300，retries 为 2、database 为 postgresql；json_values:settings.json 检查通过。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "产物检查通过，且提供的最终文件内容是有效 JSON，验证结论有产物证据支持。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "已完成限定修改并报告结果，没有再次索要授权或讨论技术选型。"
+          }
+        ],
+        "note": "满足全部标准，报告简洁。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答的最终产物和检查结果完全相同，均满足全部标准，无实质差异。"
+  },
+  "usage": {
+    "input_tokens": 13540,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 458,
+    "reasoning_output_tokens": 28
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

@@ -1,0 +1,67 @@
+{
+  "scenario": "decision-05",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "888ee2f334ca025e0e90f8948e465b1c445541399ab6c29fed1023ba55082e4f",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "第一轮依据每小时2次、每次10条、约100ms低于1秒，建议保持同步；未无依据增加队列。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "第二轮明确对比500次同时导出、每次10万条及新的提交和后台时限，并以同步压测超时说明原建议已不适用。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "提出可靠保存任务后1秒内返回任务ID，使用持久化队列和后台进程限制并发；将排队计入10分钟期限，推导约8.33万条/秒的吞吐下限，并要求完整链路压测验证容量。"
+          }
+        ],
+        "note": "三项均满足；说明较完整，但篇幅更长。未提供需要检查的文件产物。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "第一轮依据低调用量及约100ms的整批耗时建议继续同步，明确当前没有拥堵或重试需求的证据。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "第二轮列出新峰值、单次规模、提交与完成时限及同步压测超时，明确更新为同步导出已不满足上线要求。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "提出可靠保存任务后1秒内返回任务ID，通过队列限制后台并发，并支持重试、幂等及状态查询；按提交后10分钟计算吞吐下限，明确需完整链路压测验证容量。"
+          }
+        ],
+        "note": "三项均满足，表达更精简。未提供需要检查的文件产物。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答在三项标准上均有具体且正确的覆盖。X提供更多实施与验收细节，Y更简洁；不存在影响任务满足程度的实质差异。"
+  },
+  "usage": {
+    "input_tokens": 14851,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 605,
+    "reasoning_output_tokens": 42
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}

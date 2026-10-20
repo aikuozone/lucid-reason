@@ -1,0 +1,52 @@
+{
+  "scenario": "core-06",
+  "title": "权限隔离的缓存",
+  "group": "core",
+  "variant": "lr",
+  "repetition": 1,
+  "test_type": "runtime",
+  "requested_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "started_at": "2026-10-19T18:45:30.715970+00:00",
+  "status": "completed",
+  "turns": [
+    {
+      "input": "当前是离线测试；不要联网或调用外部连接。可读取工作区中已安装的技能。只为当前任务操作工作区中提供的项目文件，不修改评测环境或技能。缺少信息时说明假设，不虚构来源、数据或工具执行结果。\n\n使用 $systematic-knowledge-construction 完成下面的任务。\n\n现有企业助手使用 LangGraph + FastAPI + Redis，20 个租户，知识权限可随时收回。为检索结果缓存和会话状态提出一套可实施方案。给 Key 维度、TTL/失效、并发与权限边界，不能更换现有栈。",
+      "response": "建议采用：**检索结果用可丢弃缓存，会话用独立检查点；权限撤回通过实时鉴权和版本隔离生效，TTL 只负责清理。** 保留 LangGraph + FastAPI + Redis。\n\n已按指定技能梳理。以下是设计方案，未联网、未检查项目实现或运行测试。假设已有权威权限来源，权限变更能接入统一流程；具体库版本、流量和保留政策未知，下面的时间均为建议初值。\n\n**Key 与存储边界**\n\n先采用“每租户一个权限版本”的简单方案。20 个租户可以先接受一次权限变更使该租户检索缓存整体失效的代价，后续再按实测细化。\n\n记 `t` 为租户、`u` 为用户、`s` 为会话，`p` 为租户权限版本，`i` 为检索索引版本：\n\n| 用途 | Key 示例与必要维度 | 保存内容 |\n|---|---|---|\n| 权限控制 | `auth:{t}:control` | 单调递增的 `p`、是否正在变更；不是带 TTL 的“允许访问”缓存 |\n| 检索缓存 | `rag:{t}:v1:u:{u}:p:{p}:i:{i}:q:{h}` | 文档/chunk ID、文档版本、排序分数、检索时间；优先不存正文 |\n| 会话元数据 | `sess:{t}:u:{u}:s:{s}:meta` | 所有者、状态版本、当前 checkpoint、创建时间、绝对过期时间 |\n| LangGraph 检查点 | `cp:{t}:u:{u}:s:{s}:ns:{ns}:id:{cid}` | 图状态、消息、工具结果、来源依赖、所用权限版本 |\n| 并发控制 | `runlock:{t}:u:{u}:s:{s}` | 随机持有者 token、租约；状态中另存 fencing token |\n| 请求去重 | `idem:{t}:u:{u}:s:{s}:req:{rid}` | 执行状态、结果引用、请求参数摘要 |\n\n`h` 是规范化检索输入的哈希，包含：**最终检索查询、知识库范围、过滤条件、top-k、检索/embedding/reranker 配置版本**。查询由会话改写时，应使用改写后的查询及实际影响检索的上下文摘要。规范化不能改变查询语义。\n\n租户和用户从 FastAPI 验证后的身份上下文取得，不能直接信任请求体、模型参数或客户端 `thread_id`。首版按用户隔离缓存；角色相同也不默认具有相同数据权限。\n\n若使用 Redis Cluster，示例中的 `{t}` 可使需原子操作的租户内 Key 位于同一槽；代价是单租户热点，需压测。Key 前缀只是命名隔离，不能代替服务端授权。\n\n**检索读取、TTL 与失效**\n\n完整链路为：\n\n1. FastAPI 验证身份、租户和会话访问权，读取当前权限版本及变更状态。\n2. 命中缓存后，按当前权限重新过滤候选文档，并检查文档版本；通过后才读取正文、进入模型上下文。未命中时，检索本身也必须带租户和权限过滤。\n3. 返回数量不足时重新检索，不能让旧缓存持续降低召回。\n4. 写缓存前再核对版本；权限或索引版本已经改变，就放弃此次写入。\n5. 生成完成后，在响应授权边界再次校验权限。命中缓存不代表获得授权。\n\n建议初值：\n\n| 对象 | TTL / 失效策略 |\n|---|---|\n| 普通检索结果 | 5 分钟，加约 ±20% 抖动；按知识新鲜度要求调整 |\n| 空检索结果 | 15–30 秒；鉴权失败和依赖异常不当作空结果缓存 |\n| 文档更新 | 新索引可查询后切换 `i`；旧缓存自然过期 |\n| 文档删除、权限收回 | 立即阻止访问并推进 `p`；删除文档还需直接检查删除状态，不能等待索引更新 |\n| 权限版本与变更标记 | 不设普通缓存 TTL；缺失或不确定时拒绝受保护读取 |\n\n不采用“权限变更后仅发 Pub/Sub 删 Key”的方式保证安全：通知可能丢失，旧请求也可能在删除后写回。**版本使旧 Key 不再被读取，实时授权负责拦截越权；通知和异步删除只负责加速回收。**\n\n权限变更必须与版本发布协调。如果权威 ACL 在其他存储中，建议流程是：先设置受影响范围的拒绝标记，再提交 ACL 变更、推进版本，最后解除标记；中途失败保持拒绝并重试。所有权限变更入口都必须接入，否则不能承诺及时撤权。\n\n**会话状态与撤权**\n\nLangGraph checkpoint 是恢复执行所需的状态，不是普通检索缓存。需要保存来源依赖：\n\n- 工具结果和检索片段记录 `doc_id / doc_version / p`。\n- 助手回答、摘要、长期记忆记录其依赖的知识来源。\n- 每轮开始、断点恢复、工具执行前，重新鉴权；不能复用暂停前的授权。\n- 对话历史查询、导出、重试和结果回放也必须经过同样检查。\n\n权限变化后，旧回答和摘要也可能包含已撤回的知识。首版可保守处理：**发现会话的权限版本落后，就禁止旧知识派生内容进入模型上下文或返回客户端；重新授权后重建上下文。** 无法追踪来源的旧摘要整体废弃，不能只删引用链接。\n\n建议会话空闲 TTL 为 24 小时、绝对保留上限为 7 天，均需业务确认。活动可以延长空闲时间，但不能突破绝对上限；相关 checkpoint、写入记录、索引及去重结果要一起到期。历史 checkpoint 也不得绕过权限回放。\n\nRedis 中检查点应使用持久化、备份和避免状态被缓存淘汰的配置。优先将缓存与状态放在分别配置的 Redis 实例中，仍保留现有栈；若只能共享实例，采用 `noeviction`，缓存写入失败可跳过，checkpoint 写入失败必须明确报错，不能声称会话已保存。实际恢复保证取决于持久化配置，不能默认零丢失。\n\n**并发与故障边界**\n\n- **检索击穿**：同一缓存 Key 用 `SET NX PX` 获取短租约；释放和续租必须比较持有者 token。等待者短暂退避后重查，超时可受限回源。租约失效后的重复计算可以接受，越权结果不能接受。\n- **同一会话**：首版只允许一个活跃 run，其他请求排队或返回冲突。不能只用 FastAPI 进程内锁。\n- **防旧执行覆盖**：每次 run 获取递增 fencing token；每个 checkpoint 写入通过 Lua 或事务，原子检查持有者、fencing token 和预期状态版本。租约过期的旧 worker 即使恢复，也无法覆盖新状态。\n- **重试**：`request_id` 去重，并检查参数摘要是否一致。业务写工具另需业务幂等键；checkpoint 成功不代表外部副作用成功，恢复时必须核实。\n- **依赖故障**：检索缓存不可用时，可在完成实时授权后回源；权限来源不可用则拒绝受保护操作。会话状态不可用时停止有状态执行，不能偷偷切换到进程内继续。\n- **租户资源**：按租户限制并发、检索回源速率、缓存空间和会话大小，避免一个租户挤占其他 19 个租户。\n\n**“随时收回”的精确承诺**\n\n必须约定撤权与响应之间的顺序：把“最终授权并准许发送”作为服务端响应的授权点，让它与撤权提交按同一控制机制排序。撤权先完成，则旧请求不得获准发送；响应先获准发送，则属于已在途数据，无法追回。\n\n默认建议缓冲完整回答，再做最终授权后发送。若使用流式输出，每次发送都需经过授权门禁，撤权后停止后续片段；仅在生成开始时鉴权无法满足这一要求。已经发往客户端的字节不能撤回，若要求“撤权接口返回后旧流全部停止”，撤权流程还需等待相关发送任务停止并确认。\n\n最后用以下场景验收，而不是只看缓存命中率：\n\n- 两租户使用相同用户 ID、查询和会话 ID，仍完全隔离。\n- 缓存命中后撤权，正文、历史、摘要及 checkpoint 恢复均不能泄漏。\n- 撤权发生在检索中、缓存写回前、生成中和发送前，均符合上述授权顺序。\n- 锁过期后旧 worker 恢复，无法覆盖新 checkpoint；重复请求不会重复触发业务写。\n- 权限通知丢失、Redis 重启或版本缺失时，不回退到旧授权。\n- 会话过期后，历史检查点和结果回放入口同样失效。\n\n上线时同时观察按租户的命中率、回源量、P95、锁冲突、checkpoint 写失败，以及“撤权提交至拒绝访问”的延迟；具体阈值需要根据真实流量和业务要求确定。",
+      "exit_code": 0,
+      "elapsed_seconds": 64.909,
+      "usage": {
+        "input_tokens": 39408,
+        "cached_input_tokens": 22784,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2584,
+        "reasoning_output_tokens": 267
+      },
+      "tool_trace": [
+        {
+          "command": "/bin/bash -lc 'cat .agents/skills/systematic-knowledge-construction/SKILL.md .agents/skills/systematic-knowledge-construction/references/project-engineering.md .agents/skills/systematic-knowledge-construction/references/evidence-and-review.md'",
+          "exit_code": 0,
+          "output_sha256": "2ad345c70bc337197630baba88b7369ee14cc49e93b724d04756415865831016"
+        }
+      ]
+    }
+  ],
+  "artifact_checks": [
+    {
+      "check": "installed_skill_unchanged",
+      "passed": true
+    }
+  ],
+  "skill_load_observed": true,
+  "artifacts": {},
+  "completed_at": "2026-10-19T18:46:41.535110+00:00",
+  "installed_skill_files_sha256": {
+    "SKILL.md": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+    "references/evidence-and-review.md": "4b58016d59c9947d425b840739d62ed6f2aedfc066d3f5e2305fef0360319c4b",
+    "references/output-and-evaluation.md": "5a3315d076ac27eaf974178ae99c7a5243a3577db303a8b6d109720dc389ea3b",
+    "references/project-engineering.md": "b1b9bc7cfd33e2f4011b219d7e8cde850eca739ade8ee4118b30dd36445017da",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "agents/openai.yaml": "5ae490f82c1138d686c894354e01f4eaf72b1551d358e4335e8655d93f6bd631"
+  },
+  "source_hash_verification": "Observed installed files after run; workspaces retained unchanged."
+}

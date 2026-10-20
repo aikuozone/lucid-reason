@@ -1,0 +1,67 @@
+{
+  "scenario": "core-08",
+  "repetition": 1,
+  "assessment_type": "model_assisted",
+  "judge_model": "gpt-6.1-sol",
+  "source_sha256": "1ed0cedc6d290067791b99fb20a07bde7ffaf643adf5f772d4f20e8b07dff133",
+  "condition_mapping_revealed_after_assessment": {
+    "X": "lr",
+    "Y": "baseline"
+  },
+  "judgment": {
+    "assessments": [
+      {
+        "label": "X",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "first_turn_preserves_files 检查通过；首轮说明常量调整的条件性影响、键格式及冻结项不受直接影响，未实施修改。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "最终 src/cache.py 为 TTL_SECONDS = 120，cache_key 逻辑保持原样；三个 exact_file 检查均通过，确认指定修改及其余文件内容符合要求。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "第二轮实际产物已完成 TTL 修改；src/database.py 仍为 PostgreSQL 配置，app.json 仍为 PostgreSQL 和 Redis 配置，冻结文件精确检查均通过。"
+          }
+        ],
+        "note": "完成两轮要求；验证报告明确区分静态验证与未执行的运行时测试。"
+      },
+      {
+        "label": "Y",
+        "criteria": [
+          {
+            "index": 1,
+            "met": true,
+            "evidence": "first_turn_preserves_files 检查通过；首轮分析 TTL 翻倍的条件性影响，并保留键生成逻辑、冻结文件及组件配置。"
+          },
+          {
+            "index": 2,
+            "met": true,
+            "evidence": "最终 src/cache.py 为 TTL_SECONDS = 120，cache_key 逻辑保持原样；三个 exact_file 检查均通过，冻结文件内容与指定产物一致。"
+          },
+          {
+            "index": 3,
+            "met": true,
+            "evidence": "第二轮已在实际产物中落实修改，未停留在建议；src/database.py 和 app.json 的精确检查通过，承接了首轮冻结范围。"
+          }
+        ],
+        "note": "完成两轮要求；报告了字节比对和 Python 语法解析验证。"
+      }
+    ],
+    "preference": "tie",
+    "comparison_note": "两份回答的产物与检查结果一致，均满足全部标准。说明和验证报告的细微措辞差异不构成实质差异。"
+  },
+  "usage": {
+    "input_tokens": 14493,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 421,
+    "reasoning_output_tokens": 0
+  },
+  "limitations": "Same model family as responses; not an independent human evaluation. Output style can partially reveal a condition despite anonymized labels."
+}
