@@ -15,7 +15,7 @@
     "longDescription": "lucid-reason（lr）适用于概念和完整领域学习、算法与跨学科知识、企业项目理解、工程设计、专业决策、故障诊断和研究。按实际目标建立必要知识结构，解释核心机制、因果关系、实践和边界；根据风险核验事实与证据，兼顾充分理解与清晰表达。可通过“lr 什么是 pydantic basemodel？”等自然语言表达调用意图；实际自动选择由宿主决定。无需额外服务。"
   },
   "name": "systematic-knowledge-architect",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "lucid-reason (lr): Systematic understanding and reliable problem solving for focused concepts, full-domain and multidisciplinary learning, realistic projects, engineering design, professional decisions, troubleshooting, research, and follow-up. Explains necessary mechanisms, causal links, boundaries, and evidence. Use for requests naming lr or lucid-reason and for relevant systematic reasoning tasks.",
   "author": {
     "name": "blunt"

@@ -1,11 +1,20 @@
 # Changelog
 
-## Unreleased — documentation
+## 1.1.5 — 2026-10-21
+
+- Synchronize the author's updated private v1.1.4 skill body and four references into a new public distribution, preserving stable identities and public packaging customizations.
+- Strengthen goal and baseline continuity, dependency analysis across a whole system, research evidence selection, and communication suited to the deliverable's readers.
+- Explain the plugin's purpose through visual learning, system implications, a complete initial proposal, iterative revision, and shared understanding in both READMEs.
+- Add eight targeted regression scenarios, including a three-turn planning discussion and a real scoped file edit.
+- Freeze the exact source used for the historical v1.1.4 observations, keeping old evidence separate from the new release.
+- Prevent evaluation startup or incompatible resume attempts from overwriting an existing run's environment record.
+
+### Presentation improvements since 1.1.4
 
 - Put the ChatGPT Chat experience first in both project introductions, using the author's supplied description.
 - Replace the main CLI-card preview with a real public Transformer conversation, a complete native-page screenshot, and five focused page views.
 - Add screenshot capture tooling and provenance; retain CLI examples and evaluation records separately.
-- Clarify host-provided visualization, plugin availability, and the limits of screenshot evidence. Runtime instructions and the v1.1.4 package are unchanged.
+- Clarify host-provided visualization, plugin availability, and the limits of screenshot evidence.
 
 ## 1.1.4 — 2026-10-20
 

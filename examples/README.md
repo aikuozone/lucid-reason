@@ -55,4 +55,6 @@ Encoder 与 Decoder 的图示把模块职责放回信息流中，随后解释 Cr
 
 若要进一步探索机制，可以在自己的可用环境中继续追问：“展开 Multi-Head Attention 的张量形状变化”或“如果界面支持，用可调分数演示 Softmax”。这些是使用建议，不属于上面已截图的原始会话。
 
-[English project introduction](../README.md) · [中文项目介绍](../README.zh-CN.md) · [独立的 CLI 测试案例与完整记录](cli.md) · [受控评估报告](../evals/REPORT.md)
+另一个用途是持续讨论计划与方案：[三轮真实方案讨论](planning.md)记录了新版在模拟业务问题中的初案、重点调整及身份边界判断。该案例来自 CLI 的实际多轮运行，展示的是对话内容；本页图片仍是上面的原始 ChatGPT 会话。
+
+[English project introduction](../README.md) · [中文项目介绍](../README.zh-CN.md) · [历史 CLI 测试案例与完整记录](cli.md) · [v1.1.5 更新验证](../evals/UPDATE-1.1.5.md) · [v1.1.4 受控评估报告](../evals/REPORT.md)

@@ -38,6 +38,21 @@ def events_from(text):
     return events
 
 
+def save_environment(path, metadata, resume=False):
+    """Preserve the original environment, especially across source updates."""
+    if path.exists():
+        previous = json.loads(path.read_text())
+        if not resume:
+            raise ValueError("Run environment already exists; choose a new run ID or --resume-incomplete")
+        keys = ["source_version", "skill_files_sha256", "requested_model", "reasoning_effort"]
+        if "scenario_specification_sha256" in previous:
+            keys.append("scenario_specification_sha256")
+        if any(previous.get(key) != metadata.get(key) for key in keys):
+            raise ValueError("Cannot resume with changed source, scenarios, model, or reasoning effort")
+        return
+    path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
+
+
 def execute(case, variant, repetition, args, work_root):
     key = f"{case['id']}-{variant}-r{repetition}"
     cwd = work_root / key
@@ -167,6 +182,8 @@ def main():
     parser.add_argument("--effort", default="medium", choices=["low", "medium", "high", "max"])
     parser.add_argument("--codex", default="codex")
     parser.add_argument("--cases", nargs="*")
+    parser.add_argument("--scenarios", type=Path, default=ROOT / "evals/scenarios.json",
+                        help="Scenario specification; use update-scenarios.json for the 1.1.5 regressions")
     parser.add_argument("--variants", nargs="+", default=["baseline", "lr"], choices=["baseline", "lr"])
     parser.add_argument("--repetitions", type=int, default=1)
     parser.add_argument("--start-repetition", type=int, default=1)
@@ -179,7 +196,8 @@ def main():
     args = parser.parse_args()
     args.output = args.output or ROOT / "evals/results" / args.run_id
     args.stop_event = threading.Event()
-    cases = json.loads((ROOT / "evals/scenarios.json").read_text())
+    scenario_bytes = args.scenarios.read_bytes()
+    cases = json.loads(scenario_bytes)
     if args.cases:
         selected = set(args.cases)
         if selected - {c['id'] for c in cases}:
@@ -195,7 +213,12 @@ def main():
                 "sampling_seed": "not exposed", "temperature": "CLI default, not exposed", "run_id": args.run_id,
                 "limitations": ["Uses one model and one local CLI host, not a cross-host benchmark", "Natural-language implicit activation and plugin marketplace UI are not tested", "No live web or external connectors are available", "Additional transfer scenarios were authored by the publisher; they are not a sealed independent benchmark"]}
     metadata["skill_files_sha256"] = args.source_hashes
-    (args.output / "environment.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
+    metadata["scenario_specification"] = args.scenarios.name
+    metadata["scenario_specification_sha256"] = hashlib.sha256(scenario_bytes).hexdigest()
+    try:
+        save_environment(args.output / "environment.json", metadata, args.resume_incomplete)
+    except ValueError as exc:
+        parser.error(str(exc))
     work_root = Path(tempfile.mkdtemp(prefix="lr-eval-"))
     print(f"Run {args.run_id}; {version}; model={args.model}; workspaces={work_root}", flush=True)
     failures = 0

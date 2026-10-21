@@ -1,12 +1,14 @@
 # Release evaluation: v1.1.4
 
+Historical evidence for public v1.1.4. The current v1.1.5 distribution has changed instructions; see its separate [focused update verification](UPDATE-1.1.5.md). The original observations below remain attached to their [frozen source](sources/release-v1.1.4/source.json).
+
 Recorded on 2026-10-20. This report describes one model and one local CLI host. It is not a cross-model benchmark or an independent human study.
 
 Observed execution: **68 of 68 recorded conversations completed**. The set contains 22 scenarios in two conditions, plus two extra repetitions for six preselected scenarios. There are **60 passing and 0 failing artifact/integrity observations**. A completed conversation means the scenario finished; it does not mean every intermediate tool invocation succeeded.
 
 Environment: `codex-cli 0.160.0`, requested model `gpt-6.1-sol`, reasoning effort `medium`. The lr condition explicitly selects the installed skill. The baseline has no installed skill; plugins and app connections are disabled in both conditions.
 
-[Method and limitations](../docs/evaluation.md) · [Scenario inputs and criteria](scenarios.json) · [Environment and frozen source](results/release-v1.1.4/environment.json) · [Examples](../examples/README.md)
+[Method and limitations](../docs/evaluation.md) · [Scenario inputs and criteria](scenarios.json) · [Environment and source hashes](results/release-v1.1.4/environment.json) · [Historical examples](../examples/cli.md)
 
 ## Offline distribution checks
 

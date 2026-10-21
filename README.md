@@ -3,18 +3,18 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-151d2b.svg" alt="MIT license"></a>
   <a href="https://github.com/aikuozone/lucid-reason/actions/workflows/ci.yml"><img src="https://github.com/aikuozone/lucid-reason/actions/workflows/ci.yml/badge.svg" alt="Offline checks"></a>
-  <a href="https://github.com/aikuozone/lucid-reason/releases"><img src="https://img.shields.io/badge/version-1.1.4-467b5b.svg" alt="Version 1.1.4"></a>
+  <a href="https://github.com/aikuozone/lucid-reason/releases"><img src="https://img.shields.io/badge/version-1.1.5-467b5b.svg" alt="Version 1.1.5"></a>
 </p>
 
-<p align="center"><a href="README.zh-CN.md">简体中文</a> · <a href="examples/README.md">ChatGPT showcase</a> · <a href="docs/installation.md">Get started</a> · <a href="evals/REPORT.md">Evaluation evidence</a></p>
+<p align="center"><a href="README.zh-CN.md">简体中文</a> · <a href="examples/README.md">ChatGPT showcase</a> · <a href="docs/installation.md">Get started</a> · <a href="evals/UPDATE-1.1.5.md">Update verification</a></p>
 
-**Help ChatGPT explain a problem all the way through: the concepts, the mechanism, the connections, and the boundaries.**
+**Help AI understand your idea in context, make its proposal understandable, and build a shared view through discussion.**
 
-**lucid-reason (`lr`)** is a skills-only plugin for systematic understanding, engineering reasoning, and reliable problem solving. It supports focused concepts and complete domains, mathematics and algorithms, research, system design, technical decisions, and troubleshooting.
+**lucid-reason (`lr`)** is a skills-only plugin for learning, planning, discussing solutions, engineering decisions, research, and troubleshooting. It guides AI to place your ideas within their goals, constraints, and relationships, then explain mechanisms, evidence, tradeoffs, and proposals in a form you can understand, judge, and revise.
 
-For learning, it connects the knowledge in an order you can follow. For practical problems, it brings the explanation back to the actual goal, project constraints, evidence, and verification. In **ChatGPT Chat mode**, available native diagrams, mathematical notation, charts, and interactive components can help make those relationships visible.
+For visual learning, **ChatGPT Chat mode** brings the explanation together with available native diagrams, mathematical notation, charts, and interactive components. For planning, lr also considers the whole: which parts an idea affects, why a proposal fits, and what a later change would alter.
 
-The principle is **necessary completeness**: explain what the question needs, at the depth it needs. A small concept can take a few paragraphs; a whole domain needs a connected structure. You can ask naturally without arranging a workflow or deploying a separate service.
+The principle is **necessary completeness and a discussion you can build on**. A small concept can take a few paragraphs; a complex proposal needs a connected structure. Start with an idea, question, or objection in natural language, without arranging a workflow or deploying a separate service.
 
 ## A real ChatGPT conversation
 
@@ -26,30 +26,44 @@ The question was simply **`lr 系统讲解 transformer`** (“lr, explain Transf
 
 *A viewport from the actual public ChatGPT page. Open the complete capture to follow the question and answer from beginning to end, including native diagrams, mathematics, and a chart.*
 
-## What lr brings to a question
+## Why use lr?
 
-| Capability | What it is for |
-|---|---|
-| Systematic understanding | Explain what something is, why it exists, how it works, what it depends on, and where it stops applying. |
-| Causal explanation | Connect inputs, intermediate steps, outputs, and failures instead of listing terminology. |
-| Visual learning | Use a useful knowledge map, diagram, matrix, chart, or supported interactive explanation when it adds understanding. |
-| Engineering reasoning | Keep the actual business, data, resources, architecture, and acceptance criteria consistent. |
-| Decision calibration | Judge the gap between the current system and the real goal, then weigh the value and cost of a change. |
-| Evidence and review | Separate facts, derivations, estimates, simulations, and unknowns; check consequential claims and repair specific gaps. |
-| Follow-up continuity | Build on available context and revise affected conclusions when the premises change. |
+1. **Connect the explanation and the visuals.** A complex topic often becomes difficult at the relationships and intermediate steps: how modules connect, how a calculation changes, or what a chart demonstrates. lr organizes the explanation around those dependencies and uses useful diagrams, mathematics, charts, and available interactive tools in ChatGPT Chat mode. It explains how the visual relates to the text, then connects the overall structure to mechanisms, examples, and boundaries.
 
-These are instructions for the model, with no fixed answer template. The skill has no rendering engine, server, credentials, or permanent memory. The host supplies the model, tools, interface, permissions, and accessible context.
+2. **Understand what an idea means for the whole system.** “Add a component” or “use a different approach” is often a proposed implementation. lr first identifies the intended result, current capabilities, and real constraints, then follows upstream dependencies, related parts, and end-to-end consequences. A proposed unified Agent framework, for example, might really be a way to reduce repeated data entry and page switching. The relevant question is how the complete workflow improves and whether the framework earns its added cost.
+
+3. **Create a complete first proposal that makes discussion possible.** An initial plan connects the goal, main flow, responsibilities, tradeoffs, failure handling, and acceptance criteria. Even when it does not yet fit all your expectations, a coherent proposal lets you identify what is missing, what feels wrong, and what matters more. That shared starting point can reveal new ideas and better solutions.
+
+4. **Keep the whole coherent as you revise it.** When you change a priority, reject a step, or ask to adjust one part, lr carries forward valid goals and confirmed decisions, checks the affected dependencies, and revises the relevant parts. Understanding the whole and changing the whole have different scopes. Unaffected choices stay stable; fundamental conflicts call for an explanation of the broader change needed. Each exchange helps establish a current proposal you can both understand.
+
+5. **Explain the basis for decisions so you can take part.** lr makes the reasons, conditions, benefits, costs, and verification methods understandable, while separating facts, derivations, estimates, and unknowns. You can challenge an assumption, compare a tradeoff, or change direction. Shared understanding requires making disagreements and their reasons clear; a suggestion that violates the goal or constraints should prompt an explanation and a workable alternative.
+
+These instructions guide the model's understanding, analysis, and communication; actual results depend on the model and task. The host supplies tools, rendering, permissions, and accessible context. The skill adds no server, credentials, rendering engine, or permanent memory.
+
+## Discuss a plan and improve it together
+
+Start with an unfinished idea. You do not need to write the entire requirements document or architecture first. For example:
+
+| Stage | What you might say | What the discussion should establish |
+|---|---|---|
+| Form a complete proposal | “I have ticketing and search tools. I want less page switching and am considering a unified Agent. Understand the goal and propose a complete starting point.” | Connections between the actual goal, current system, full workflow, necessary changes, tradeoffs, and acceptance. |
+| Explain what does not fit | “Repeated field entry is the main problem. Keep both tools and the existing permissions; revise the relevant flow.” | A corrected priority, its dependency impacts, and the conclusions that still hold. |
+| Consolidate the shared view | “State the current proposal, reasons, unresolved assumptions, and next checks, then make the implementation plan.” | A shared proposal that is easy to understand, verify, and develop further. |
+
+The initial proposal exposes disagreements; follow-up questions deepen understanding; revisions produce a better fit. See a [real three-turn planning discussion](examples/planning.md). Natural follow-ups also work for learning, technical decisions, and diagnosis.
 
 ## Use it in ChatGPT Chat mode
 
 If lucid-reason is available in your account or workspace, open a Chat conversation, type **`@`**, and select lucid-reason or its skill from the picker. Then ask your question. `lr` is a convenient natural-language hint; explicit selection is the way to make your intended skill clear.
 
 ```text
-lr 系统讲解 Transformer。
+lr Explain Transformer systematically.
 
-lr 解释 Softmax。如果界面支持，让我调节输入分数并观察概率如何变化。
+lr Explain Softmax. If the interface supports it, let me adjust the scores and observe the probabilities.
 
-lr 分析这个 RAG 项目：保留现有架构，先定位效果下降的证据与原因。
+lr Analyze what this idea would mean for the whole system, then give me a complete proposal we can discuss.
+
+lr Keep the previous goals and constraints. Revise the part we discussed and explain the related impacts.
 ```
 
 Follow up naturally: “Why is this step necessary?”, “Show the tensor shapes here”, or “Explain only the authorization step using the previous architecture.”
@@ -85,9 +99,9 @@ python3 -m unittest discover -s tests -v
 python3 scripts/build_release.py
 ```
 
-The [evaluation report](evals/REPORT.md) retains 68 completed local conversations across 22 scenarios, including paired baseline/lr runs and a repeated subset. These are Codex CLI observations with model-assisted rubric judgments. They do not test the ChatGPT frontend or establish a universal quality improvement. A missed rollback-trigger requirement remains documented in the report.
+The [v1.1.5 update verification](evals/UPDATE-1.1.5.md) records focused regressions for this update. The [historical v1.1.4 report](evals/REPORT.md) retains 68 completed local conversations across 22 scenarios, including paired runs, a repeated subset, and observed failures. Its source is now frozen separately; those results do not establish that the current version passed the same evaluation.
 
-Read the [methodology and reproduction commands](docs/evaluation.md), [full CLI examples](examples/cli.md), and [native screenshot provenance](docs/presentation.md). The public ChatGPT example is a presentation case with an unspecified original model and skill version, separate from the controlled evaluation.
+Read the [methodology and reproduction commands](docs/evaluation.md), [historical CLI examples](examples/cli.md), and [native screenshot provenance](docs/presentation.md). Observations and assessments do not establish universal improvement. The public ChatGPT example demonstrates native presentation with an unspecified original model and skill version.
 
 ## Package and contribute
 

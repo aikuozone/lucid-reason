@@ -1,3 +1,7 @@
 * text=auto eol=lf
+
+# Preserve original whitespace in versioned evidence and actual response text.
+evals/sources/** whitespace=-blank-at-eof
+examples/planning.md whitespace=-blank-at-eol
 *.png binary
 *.zip binary

@@ -32,6 +32,7 @@ def generate():
     checks = [check for r in records.values() for check in r['artifact_checks']]
     model = json.loads((folder/'environment.json').read_text())
     lines = ['# Release evaluation: v1.1.4', '',
+        'Historical evidence for public v1.1.4. The current v1.1.5 distribution has changed instructions; see its separate [focused update verification](UPDATE-1.1.5.md). The original observations below remain attached to their [frozen source](sources/release-v1.1.4/source.json).', '',
         'Recorded on 2026-10-20. This report describes one model and one local CLI host. It is not a cross-model benchmark or an independent human study.', '',
         f'Observed execution: **{statuses.get("completed",0)} of {count} recorded conversations completed**. '
         f'The set contains 22 scenarios in two conditions, plus two extra repetitions for six preselected scenarios. '
@@ -40,7 +41,7 @@ def generate():
         f'Environment: `{model["cli_version"]}`, requested model `{model["requested_model"]}`, reasoning effort `{model["reasoning_effort"]}`. '
         'The lr condition explicitly selects the installed skill. The baseline has no installed skill; plugins and app connections are disabled in both conditions.', '',
         '[Method and limitations](../docs/evaluation.md) · [Scenario inputs and criteria](scenarios.json) · '
-        '[Environment and frozen source](results/release-v1.1.4/environment.json) · [Examples](../examples/README.md)', '',
+        '[Environment and source hashes](results/release-v1.1.4/environment.json) · [Historical examples](../examples/cli.md)', '',
         '## Offline distribution checks', '']
     offline_path = ROOT/'evals/offline-checks.json'
     if offline_path.exists():

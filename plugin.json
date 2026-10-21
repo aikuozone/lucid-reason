@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "systematic-knowledge-architect",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "lucid-reason (lr): Systematic understanding and reliable problem solving for focused concepts, full-domain and multidisciplinary learning, realistic projects, engineering design, professional decisions, troubleshooting, research, and follow-up. Explains necessary mechanisms, causal links, boundaries, and evidence. Use for requests naming lr or lucid-reason and for relevant systematic reasoning tasks.",
   "author": {
     "name": "blunt"

@@ -6,7 +6,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "evals/results/release-v1.1.4"
-SKILL = ROOT / "skills/systematic-knowledge-construction"
+SOURCE = ROOT / "evals/sources/release-v1.1.4"
+SKILL = SOURCE / "skills/systematic-knowledge-construction"
 
 
 class EvidenceTests(unittest.TestCase):
@@ -47,7 +48,10 @@ class EvidenceTests(unittest.TestCase):
 
     def test_environment_matches_records_and_source_version(self):
         environment = json.loads((RESULTS / 'environment.json').read_text())
-        self.assertEqual(environment['source_version'], json.loads((ROOT/'plugin.json').read_text())['version'])
+        self.assertEqual(environment['source_version'], json.loads((SOURCE/'plugin.json').read_text())['version'])
+        self.assertEqual(environment['skill_files_sha256'], {
+            p.relative_to(SKILL).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in SKILL.rglob('*') if p.is_file()})
         for record in self.records:
             self.assertEqual(record['requested_model'], environment['requested_model'])
             self.assertEqual(record['reasoning_effort'], environment['reasoning_effort'])

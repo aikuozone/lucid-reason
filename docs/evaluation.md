@@ -14,6 +14,26 @@ The [native ChatGPT showcase](../examples/README.md) is separate presentation ev
 
 The additional cases are publisher-authored, not a sealed independent benchmark. The original cases are visible in the skill references, so performance on them cannot establish generalization by itself.
 
+## Focused verification for v1.1.5
+
+[update-scenarios.json](../evals/update-scenarios.json) covers the seven new upstream acceptance directions and a three-turn planning discussion: evidence boundaries, deployment dependencies, a real scoped edit, audience-appropriate delivery, cross-domain reasoning, necessary redesign, a focused concept, and revision toward a coherent proposal. These scenarios were written with the updated instructions visible.
+
+The update run uses only the lr condition, once per scenario. This is a focused regression check, not a new paired benchmark or a measure of improvement. Runtime completion, source reads, and fixture checks are recorded separately from the coding assistant's review of the actual responses against the criteria. There is no independent human or blinded judge in this review.
+
+```bash
+python3 scripts/run_evaluation.py --model gpt-6.1-sol \
+  --scenarios evals/update-scenarios.json --variants lr \
+  --workers 3 --run-id my-v1.1.5-regression
+```
+
+The [update verification record](../evals/UPDATE-1.1.5.md) links every actual response and describes the observations and limits. It does not establish ChatGPT frontend interaction or fresh catalog installation.
+
+## Historical source and version boundaries
+
+The original [v1.1.4 results](../evals/REPORT.md) remain tied to their exact [frozen skill source and manifest](../evals/sources/release-v1.1.4/source.json). Offline checks compare those historical records against that snapshot, rather than the current instructions. The recorded v1.1.4 environment and answers have not been rewritten to use the new version.
+
+Use a fresh run ID after changing source. The runner now rejects an existing run before replacing its environment record, and an incompatible resume leaves the original metadata intact. A successful current package check cannot turn a historical response-quality observation into a claim about the current version.
+
 ## Controlled execution
 
 The question and neutral offline instructions are the same in both conditions. The lr condition additionally begins with the explicit `$systematic-knowledge-construction` selector. That intervention is recorded in the full input.

@@ -46,7 +46,7 @@ To remove the skill, remove only `your-project/.agents/skills/systematic-knowled
 
 ## From a release ZIP
 
-Download `lucid-reason-1.1.4.zip` and `SHA256SUMS` from the GitHub release. On Linux, verify the downloaded file in the same directory:
+Download `lucid-reason-1.1.5.zip` and `SHA256SUMS` from the GitHub release. On Linux, verify the downloaded file in the same directory:
 
 ```bash
 sha256sum -c SHA256SUMS

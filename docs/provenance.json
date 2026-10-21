@@ -1,15 +1,43 @@
 {
-  "upstream_version": "1.1.3",
-  "export_verified_on": "2026-10-20",
-  "verification": "Compared with current owned plugin release through Plugin Creator; all nine exported files matched the installed snapshot before public packaging changes.",
+  "distribution_version": "1.1.5",
+  "upstream_version": "1.1.4",
+  "export_verified_on": "2026-10-21",
+  "verification": "All nine current Plugin Creator source files matched the installed 1.1.4 snapshot. The skill body and four reference documents are exported byte for byte.",
   "copyright_holder": "blunt",
-  "upstream_skill_sha256": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+  "upstream_skill_sha256": "82b330aadc3300f23d248f0916735ac954c39ec5fb80a90b069ee97b0a214949",
+  "upstream_skill_files_sha256": {
+    "SKILL.md": "82b330aadc3300f23d248f0916735ac954c39ec5fb80a90b069ee97b0a214949",
+    "agents/openai.yaml": "9dc5d6dc15e680f8c919abeb1b7060b22e250c4aefe083efba9627d093cf3564",
+    "references/evidence-and-review.md": "40cc3d8e8812460c586c281435c8644cbbfdfd3f59a4d9a39abcafa12585e441",
+    "references/knowledge-architecture.md": "2c44b36cb57cd348593fef4d20f598a4ac4c462be466201d72d4601571651eb7",
+    "references/output-and-evaluation.md": "6f0e83ec10220ea1d4c5240d0f14aaec24e87152bce566c1728a28514f939b41",
+    "references/project-engineering.md": "1a2738253bb5c64e2869f91b75041e66ef921efbf619dee1374d88afd6671c53"
+  },
+  "instruction_body_changed_from_upstream": false,
+  "instruction_body_changed_since_public_1_1_4": true,
   "release_changes": [
-    "Public MIT repository and bilingual documentation",
-    "Remove personal contact email from public manifests",
-    "Bump distribution version to 1.1.4",
-    "Use explicit stable skill selector in the UI default prompt",
-    "Add packaging, installation, tests and evaluation evidence"
+    "Sync upstream 1.1.4 instructions and references into public distribution 1.1.5",
+    "Explain visual learning, system-wide implications, iterative planning, and shared understanding in both READMEs",
+    "Preserve public manifest privacy changes, stable identifiers, and the explicit Codex selector",
+    "Freeze historical 1.1.4 evaluation source and retain its original observations",
+    "Add focused runtime regressions for the updated behavior"
   ],
-  "instruction_body_changed": false
+  "previous_exports": [
+    {
+      "distribution_version": "1.1.4",
+      "upstream_version": "1.1.3",
+      "export_verified_on": "2026-10-20",
+      "verification": "Compared with current owned plugin release through Plugin Creator; all nine exported files matched the installed snapshot before public packaging changes.",
+      "copyright_holder": "blunt",
+      "upstream_skill_sha256": "4da8d6470ba0228f65655f6891cb302f56a78634988a182130a10878838ad152",
+      "release_changes": [
+        "Public MIT repository and bilingual documentation",
+        "Remove personal contact email from public manifests",
+        "Bump distribution version to 1.1.4",
+        "Use explicit stable skill selector in the UI default prompt",
+        "Add packaging, installation, tests and evaluation evidence"
+      ],
+      "instruction_body_changed": false
+    }
+  ]
 }
