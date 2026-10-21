@@ -1,5 +1,12 @@
 # Changelog
 
+## Documentation update — 2026-10-21
+
+- Create a new synthetic queue-learning and three-turn planning case using a real lr 1.1.5 run, without reusing earlier showcase material.
+- Publish the original generated interactive lesson, full conversation, browser recording, desktop/mobile captures and source hashes.
+- Replace the main README demonstration with the new case and add a static interactive showcase, independent calculation checks and reproduction instructions.
+- Retain the peer showcase research and archive prior presentation provenance.
+
 ## 1.1.5 — 2026-10-21
 
 - Synchronize the author's updated private v1.1.4 skill body and four references into a new public distribution, preserving stable identities and public packaging customizations.

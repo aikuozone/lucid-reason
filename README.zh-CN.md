@@ -1,6 +1,6 @@
 <p align="center"><img src="docs/assets/hero.svg" alt="lucid-reason：面向 ChatGPT 的系统性理解、工程推理与可靠问题解决" width="100%"></p>
 
-<p align="center"><a href="README.md">English</a> · <a href="examples/README.md">ChatGPT 真实展示</a> · <a href="docs/installation.md">使用与安装</a> · <a href="evals/UPDATE-1.1.5.md">更新验证</a> · <a href="https://github.com/aikuozone/lucid-reason/releases/tag/v1.1.5">v1.1.5</a> · <a href="LICENSE">MIT</a></p>
+<p align="center"><a href="README.md">English</a> · <a href="examples/README.md">使用效果展示</a> · <a href="docs/installation.md">使用与安装</a> · <a href="evals/UPDATE-1.1.5.md">更新验证</a> · <a href="https://github.com/aikuozone/lucid-reason/releases/tag/v1.1.5">v1.1.5</a> · <a href="LICENSE">MIT</a></p>
 
 **让 AI 系统地理解你的想法，让你清楚理解方案，在持续讨论中形成一致的整体认识。**
 
@@ -10,15 +10,20 @@
 
 核心理念是**必要范围内的完整理解，以及可以持续深入的共同讨论**。局部概念可以用几个自然段讲清，复杂方案需要建立完整主干。直接用自然语言提出想法、疑问或不满意之处即可，无需手动编排工作流或部署额外服务。
 
-## 真实 ChatGPT 对话：系统讲解 Transformer
+## 看 lr 把原因讲清，再把方案一起改好
 
-这条对话的提问只有一句：**`lr 系统讲解 transformer`**。回答从整体知识地图展开，逐步连接 Q/K/V、注意力矩阵、因果 Mask、模型架构、训练与生成，再落到 KV Cache 等工程问题。
+**平均产能够用，为什么高峰仍然排队？** 我们自行设计了一家虚构咖啡店的全新案例，用 lr 连续运行三轮：先用可操作的图文解释机制，再根据两次反馈修订完整方案。
 
-**[打开原始 ChatGPT 共享对话](https://chatgpt.com/share/6ad6bc80-00d0-83e8-a6c7-f83d75adaf68)** · [查看完整页面长图](docs/assets/chatgpt-transformer/full.png) · [更多视图与截图说明](examples/README.md)
+| 看什么 | 具体发生什么 |
+|---|---|
+| 图文与交互一起建立理解 | 保持同样 81 位顾客，改变到达节奏或制作速度，对照解释、排队曲线与等待指标，亲眼看见积压如何形成。 |
+| 完整方案在讨论中改进 | 先补充“不加人、不买设备”，再提出“不排除非手机顾客”，观察方案如何吸收约束、明确公平的时间口径，并保留撤回办法。 |
 
-<a href="docs/assets/chatgpt-transformer/full.png"><img src="docs/assets/chatgpt-transformer/knowledge-map.png" alt="真实 ChatGPT 共享页面：Transformer 知识地图及模块关系" width="100%"></a>
+**[打开可交互展示页](https://aikuozone.github.io/lucid-reason/)** · [完整三轮对话](examples/queue-lab/conversation.md) · [截图、录屏与复现说明](examples/queue-lab/README.md)
 
-*上图为真实共享页的局部视图；完整长图保留从提问到回答结尾的内容，包括对话中的原生图示、数学表达与图表。*
+<a href="https://aikuozone.github.io/lucid-reason/demos/queue-lab/"><img src="docs/assets/queue-lab/preview.png" alt="lr 实际生成的交互讲解：到达节奏和制作速度滑块、等待指标及排队曲线" width="100%"></a>
+
+*lr 1.1.5 在 Codex 中使用 gpt-6.1-sol 实际生成，截图来自浏览器运行。案例为教学模拟；交互页面是实际生成的产物，不是 ChatGPT 原生界面截图，也不是门店实测成效。*
 
 ## 为什么使用 lr
 
@@ -51,16 +56,16 @@
 如果你的账号或工作区已经可以使用 lucid-reason，在 Chat 对话输入框输入 **`@`**，从选择器中选中 lucid-reason 或其技能，再自然描述问题。`lr` 是便于表达使用意图的简称；显式选择可以明确指定要使用的技能。
 
 ```text
-lr 系统讲解 Transformer。
+lr 解释为什么平均产能足够，高峰时仍然排队。
 
-lr 解释 Softmax。如果界面支持，让我调节输入分数并观察概率如何变化。
+lr 保持同样一批顾客。如果界面支持，让我调节到达节奏和制作速度，观察等待怎样变化。
 
 lr 帮我分析这个想法对整个系统意味着什么，先给一份依据清楚、可讨论的完整方案。
 
 lr 沿用前面的目标和约束，只修改我们刚讨论的部分，解释关联影响。
 ```
 
-也可以继续追问：“为什么需要这一步？”“展示这里的张量形状变化。”“沿用前面的架构，只深入解释权限校验。”
+也可以继续追问：“为什么需要这一步？”“展示等待时间怎样一步步累积。”“沿用前面的架构，只深入解释权限校验。”
 
 图表和交互能力取决于当次客户端与可用工具。相关宿主说明见 OpenAI 的[技能文档](https://learn.chatgpt.com/docs/build-skills)与[可视化文档](https://learn.chatgpt.com/docs/visualizations)。本仓库提供源码和运行包，GitHub 开源发布本身不会将插件加入 ChatGPT 公共目录。接入条件见[使用与安装说明](docs/installation.md)。
 
@@ -80,7 +85,7 @@ python3 scripts/install_skill.py --target /你的项目绝对路径/.agents/skil
 $systematic-knowledge-construction 解释 BaseModel 如何参与 Agent 工具调用，覆盖参数校验、业务授权、执行和结果确认。
 ```
 
-已测路径、发行包安装和移除方法见[安装说明](docs/installation.md)。ChatGPT 原生视觉效果由上面的真实共享案例展示。
+已测路径、发行包安装和移除方法见[安装说明](docs/installation.md)。上面的展示明确记录了运行宿主，并保留实际生成的交互讲解页面。
 
 ## 测试与复现
 
@@ -95,7 +100,7 @@ python3 scripts/build_release.py
 
 [v1.1.5 更新验证](evals/UPDATE-1.1.5.md)单独记录本次更新的针对性回归。[v1.1.4 历史报告](evals/REPORT.md)保留了旧版 22 个场景下的 68 次已完成本地会话，包含成对运行及部分重复运行，并保留实际发现的缺口。历史记录对应的源文件已经冻结，不能作为新版已通过相同评估的证明。
 
-[评估方法与复现命令](docs/evaluation.md)、[历史 CLI 案例](examples/cli.md)、[原生截图来源与复现方式](docs/presentation.md)分别记录不同证据。真实回答观察与评分不代表普遍质量提升；ChatGPT 共享案例用于展示原生呈现，其原始模型与技能版本未在公开页面中标明。
+[评估方法与复现命令](docs/evaluation.md)、[历史 CLI 案例](examples/cli.md)、[展示素材来源与复现方式](docs/presentation.md)分别记录不同证据。真实回答观察与评分不代表普遍质量提升；新案例记录了模型、技能版本、完整回答、原始交互产物及浏览器检查，没有无技能对照。
 
 ## 分发与贡献
 

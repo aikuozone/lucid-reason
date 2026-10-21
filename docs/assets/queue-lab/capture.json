@@ -1,0 +1,96 @@
+{
+  "captured_at": "2026-10-21T05:01:21.746356+00:00",
+  "browser": "130.0.6723.31",
+  "playwright": "1.48.0",
+  "source": "docs/demos/queue-lab/index.html",
+  "source_sha256": "8715fa0d76e9d6b682b2c33e8f4ab820b564185b48ba3de6d347c1490c7b8cc9",
+  "kind": "Actual generated artifact in a browser; not native ChatGPT UI",
+  "landing_page_sha256": "9fd785ab57c98d1a3badd5c2f496612d6466df7a1cfb25a7ccbea1c14c63f021",
+  "video": {
+    "duration_seconds": 34.84,
+    "width": 1280,
+    "height": 900
+  },
+  "lesson_changes_for_capture": "none; only native controls, viewport and scrolling",
+  "desktop_viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "desktop_element_box": {
+    "x": 188,
+    "y": 0.03125,
+    "width": 904,
+    "height": 1232.65625
+  },
+  "mobile_viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "device_scale_factor": 1,
+  "computation_checks": {
+    "combinations": 3721,
+    "customer_records_checked": 301401,
+    "invalid_inputs_rejected": 8,
+    "fractional_case": true,
+    "max_absolute_error": 2.7000623958883807e-13,
+    "oracle": "Closed-form equally spaced FCFS, independent of the implementation recurrence"
+  },
+  "svg_area_checks": [
+    {
+      "arrival_window": 30,
+      "service_seconds": 60,
+      "svg_area_person_minutes": 2039.9999999999989,
+      "record_total_wait": 2039.9999999999998
+    },
+    {
+      "arrival_window": 90,
+      "service_seconds": 60,
+      "svg_area_person_minutes": 0,
+      "record_total_wait": 0
+    },
+    {
+      "arrival_window": 60,
+      "service_seconds": 80,
+      "svg_area_person_minutes": 1919.999999999999,
+      "record_total_wait": 1919.999999999999
+    },
+    {
+      "arrival_window": 30,
+      "service_seconds": 100,
+      "svg_area_person_minutes": 4200.000000000005,
+      "record_total_wait": 4200.000000000002
+    }
+  ],
+  "interaction_checks": [
+    "both presets reset both sliders and update metrics",
+    "12 UI metric comparisons across four parameter pairs",
+    "keyboard End/Home and ArrowRight update sliders",
+    "mobile presets and no page horizontal overflow"
+  ],
+  "landing_page_checks": {
+    "desktop": {
+      "horizontal_overflow": false,
+      "stories": 3,
+      "full_transcripts_expand": 3
+    },
+    "mobile": {
+      "horizontal_overflow": false,
+      "stories": 3,
+      "full_transcripts_expand": 3
+    }
+  },
+  "page_errors": [],
+  "remote_requests": [],
+  "files_sha256": {
+    "cover-desktop.png": "d14c22f02a1cda96d4f50a3605b57293894e65496e6763fd58ffc222d1971384",
+    "cover-mobile.png": "df30748db0b61bd414a706a08adb2481fd584c9e6911c1cdae38d4adbbdc41f5",
+    "desktop.png": "f0cb5d60b1d0afa90d769823d9df963152bdef8fdd09d53e444e9124ea007cbe",
+    "full-desktop.png": "2c9d16426fc5c361fca87c3b755f2ce252ea53ac1a4f24f9bb52c688c7fab64c",
+    "full-mobile.png": "65d1a3a79202cbb633d47bf18a11f314341d1216267bd1c0acdf0d71ebe57aef",
+    "mobile.png": "cf36ccc155f2b09dbe0ad38813daca89353c30a806d4f31a9cf2c72040064b3b",
+    "preview.png": "5ad3ad3c5d4005833535dba88061f0b7413651ba716bb9ac9ccdeecafbd44aa1",
+    "story-desktop.png": "3f84db82958b384cc82931f85a0d15822e0dbbd6eb61b0feb02027a8c4033a53",
+    "story-mobile.png": "78fadf8da53a985463e419998722c08e44fd283b12e5c1a2ae6efb815a27e5a6",
+    "walkthrough.webm": "3b76fcd7968afdf6b07b5b40c68d4f8108daaf514a1f48785110c8fc5128e3c2"
+  }
+}

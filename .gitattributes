@@ -3,5 +3,8 @@
 # Preserve original whitespace in versioned evidence and actual response text.
 evals/sources/** whitespace=-blank-at-eof
 examples/planning.md whitespace=-blank-at-eol
+examples/queue-lab/conversation.md whitespace=-blank-at-eol
+docs/index.html whitespace=-blank-at-eol
 *.png binary
 *.zip binary
+*.webm binary

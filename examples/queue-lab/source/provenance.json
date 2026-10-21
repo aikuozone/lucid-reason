@@ -1,0 +1,29 @@
+{
+  "kind": "publisher-authored synthetic scenario, actual native model run",
+  "host": "codex-cli 0.160.0",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "plugin_version": "1.1.5",
+  "started_at": "2026-10-21T04:47:58.991348+00:00",
+  "completed_at": "2026-10-21T04:55:46.070909+00:00",
+  "native_session_turns": 3,
+  "skill_read_observed": true,
+  "path_base": "repository root",
+  "scenario": "examples/queue-lab/source/scenario.json",
+  "record": "examples/queue-lab/source/run/queue-lab-lr-r1.json",
+  "generated_artifact": "docs/demos/queue-lab/index.html",
+  "artifact_editorial_changes": "none; copied verbatim from the recorded artifact",
+  "readable_transcript_changes": "Temporary absolute explanation.html links point to the corresponding repository artifact; the raw JSON is unchanged",
+  "files_sha256": {
+    "examples/queue-lab/source/run/queue-lab-lr-r1.json": "ac66dc882cd2a89affd39e7301ab6d368077ed8db0499d0f37a24b78bff190c5",
+    "examples/queue-lab/source/run/environment.json": "5b597b6df4b440b88b53fff44acf623b8b4da8e5e285b1fac1af574aab619cfb",
+    "examples/queue-lab/source/scenario.json": "ebddff43a07e69ac07b81252e71663326f4caa3f21ea0154595a8d1b5c8dffc5",
+    "docs/demos/queue-lab/index.html": "8715fa0d76e9d6b682b2c33e8f4ab820b564185b48ba3de6d347c1490c7b8cc9",
+    "examples/queue-lab/conversation.md": "bfe87738145d51e37cf37bd1152f573aa83cecfbdf73f452cd73b64af2543fb2"
+  },
+  "boundaries": [
+    "Not a native ChatGPT UI capture",
+    "No independently measured store outcomes or skill-versus-baseline comparison",
+    "Landing-page summaries are editorial; quotes must match recorded responses"
+  ]
+}

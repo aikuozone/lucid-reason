@@ -6,7 +6,7 @@
   <a href="https://github.com/aikuozone/lucid-reason/releases"><img src="https://img.shields.io/badge/version-1.1.5-467b5b.svg" alt="Version 1.1.5"></a>
 </p>
 
-<p align="center"><a href="README.zh-CN.md">简体中文</a> · <a href="examples/README.md">ChatGPT showcase</a> · <a href="docs/installation.md">Get started</a> · <a href="evals/UPDATE-1.1.5.md">Update verification</a></p>
+<p align="center"><a href="README.zh-CN.md">简体中文</a> · <a href="examples/README.md">See lr in action</a> · <a href="docs/installation.md">Get started</a> · <a href="evals/UPDATE-1.1.5.md">Update verification</a></p>
 
 **Help AI understand your idea in context, make its proposal understandable, and build a shared view through discussion.**
 
@@ -16,15 +16,20 @@ For visual learning, **ChatGPT Chat mode** brings the explanation together with 
 
 The principle is **necessary completeness and a discussion you can build on**. A small concept can take a few paragraphs; a complex proposal needs a connected structure. Start with an idea, question, or objection in natural language, without arranging a workflow or deploying a separate service.
 
-## A real ChatGPT conversation
+## See lr explain a mechanism and revise a plan
 
-The question was simply **`lr 系统讲解 transformer`** (“lr, explain Transformer systematically”). The shared conversation moves from a knowledge map through Q/K/V, attention matrices and causal masks to architecture, training, generation, and KV Cache.
+**Average capacity is enough. Why does the morning queue still grow?** We created a new fictional coffee-shop scenario and ran lr through three continuous turns. The result connects an interactive explanation with a proposal that changes as the user's priorities become clearer.
 
-**[Open the original ChatGPT conversation](https://chatgpt.com/share/6ad6bc80-00d0-83e8-a6c7-f83d75adaf68)** · [Full-page screenshot](docs/assets/chatgpt-transformer/full.png) · [More views and capture details](examples/README.md)
+| Part | What to look for |
+|---|---|
+| Understand the mechanism | Keep the same 81 customers; change arrival timing or preparation speed. Read the explanation alongside the queue curve and waiting times. |
+| Discuss the whole proposal | Add “no extra staff or equipment,” then “include people without phones.” Follow how the plan incorporates those constraints, defines fair waiting measures, and keeps a way to roll back. |
 
-<a href="docs/assets/chatgpt-transformer/full.png"><img src="docs/assets/chatgpt-transformer/knowledge-map.png" alt="Real ChatGPT shared page: Transformer knowledge map and module relationships" width="100%"></a>
+**[Open the interactive showcase](https://aikuozone.github.io/lucid-reason/)** · [Read all three turns](examples/queue-lab/conversation.md) · [Screenshots, recording and reproduction](examples/queue-lab/README.md)
 
-*A viewport from the actual public ChatGPT page. Open the complete capture to follow the question and answer from beginning to end, including native diagrams, mathematics, and a chart.*
+<a href="https://aikuozone.github.io/lucid-reason/demos/queue-lab/"><img src="docs/assets/queue-lab/preview.png" alt="Actual lr-generated interactive lesson: arrival and preparation controls, waiting metrics, and a queue curve" width="100%"></a>
+
+*Actual lr 1.1.5 output from Codex with gpt-6.1-sol, rendered and captured in a browser. The showcase is in Chinese. This is a synthetic teaching case; the page is a generated artifact, not a native ChatGPT interface capture or measured store outcome.*
 
 ## Why use lr?
 
@@ -57,16 +62,16 @@ The initial proposal exposes disagreements; follow-up questions deepen understan
 If lucid-reason is available in your account or workspace, open a Chat conversation, type **`@`**, and select lucid-reason or its skill from the picker. Then ask your question. `lr` is a convenient natural-language hint; explicit selection is the way to make your intended skill clear.
 
 ```text
-lr Explain Transformer systematically.
+lr Explain why average capacity can be enough while a queue still forms at peak times.
 
-lr Explain Softmax. If the interface supports it, let me adjust the scores and observe the probabilities.
+lr Keep the same customers. If the interface supports it, let me change arrival timing and preparation speed to see how waiting changes.
 
 lr Analyze what this idea would mean for the whole system, then give me a complete proposal we can discuss.
 
 lr Keep the previous goals and constraints. Revise the part we discussed and explain the related impacts.
 ```
 
-Follow up naturally: “Why is this step necessary?”, “Show the tensor shapes here”, or “Explain only the authorization step using the previous architecture.”
+Follow up naturally: “Why is this step necessary?”, “Show how the waiting time accumulates”, or “Explain only the authorization step using the previous architecture.”
 
 Visual and interactive features depend on the client and the tools available in that conversation. See OpenAI's [skills documentation](https://learn.chatgpt.com/docs/build-skills) and [visualizations documentation](https://learn.chatgpt.com/docs/visualizations). This GitHub release provides the source and runtime package; it does not itself add lr to the public ChatGPT plugin catalog. See [installation and availability](docs/installation.md).
 
@@ -86,7 +91,7 @@ Start a new Codex session in that project and select it explicitly:
 $systematic-knowledge-construction Explain how BaseModel participates in an Agent tool call, from validation and authorization to execution and result confirmation.
 ```
 
-See [tested paths, release ZIP installation, and removal](docs/installation.md). The native ChatGPT visual experience is demonstrated separately above.
+See [tested paths, release ZIP installation, and removal](docs/installation.md). The showcase above records this host explicitly and includes an actual generated interactive lesson.
 
 ## Test and reproduce
 
@@ -101,7 +106,7 @@ python3 scripts/build_release.py
 
 The [v1.1.5 update verification](evals/UPDATE-1.1.5.md) records focused regressions for this update. The [historical v1.1.4 report](evals/REPORT.md) retains 68 completed local conversations across 22 scenarios, including paired runs, a repeated subset, and observed failures. Its source is now frozen separately; those results do not establish that the current version passed the same evaluation.
 
-Read the [methodology and reproduction commands](docs/evaluation.md), [historical CLI examples](examples/cli.md), and [native screenshot provenance](docs/presentation.md). Observations and assessments do not establish universal improvement. The public ChatGPT example demonstrates native presentation with an unspecified original model and skill version.
+Read the [methodology and reproduction commands](docs/evaluation.md), [historical CLI examples](examples/cli.md), and [showcase provenance](docs/presentation.md). Observations and assessments do not establish universal improvement. The new showcase records its model, skill version, complete responses, original generated page, and browser checks; it has no baseline comparison.
 
 ## Package and contribute
 

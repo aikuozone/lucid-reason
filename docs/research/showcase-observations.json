@@ -1,0 +1,353 @@
+{
+  "review_date": "2026-10-21",
+  "repository_commit": "484c33e94003b5453ec8b8496a26b9cdd7541a10",
+  "research_method": "Exa discovery and primary-page fetch; anonymous Playwright inspection of public pages. Presentation review only; peer plugins were not installed or functionally tested.",
+  "search_queries": 6,
+  "requested_search_results": 33,
+  "returned_search_results": 33,
+  "deduplicated_urls": 31,
+  "primary_pages_fetched": 11,
+  "pages": [
+    {
+      "id": "tldraw",
+      "url": "https://tldraw.dev/blog/what-we-ve-built-with-the-tldraw-chatgpt-plugin",
+      "http": 200,
+      "title": "7 things we built with the tldraw ChatGPT plugin – tldraw: Infinite Canvas SDK for React",
+      "headings": [
+        "What we've built with the tldraw ChatGPT plugin",
+        "Visually explain how something works",
+        "Sketch a bug fix before writing any code",
+        "Build a QBR deck from your CRM",
+        "Turn a playlist into a set of cards",
+        "Design with your team and your agent",
+        "Diagram how a pull request works",
+        "Plan an office layout",
+        "Try it yourself",
+        "Join the community",
+        "Trusted by these companies"
+      ],
+      "video_elements": 1,
+      "embedded_players": [
+        {
+          "tag": "IFRAME",
+          "src": "https://www.youtube.com/embed/CAyuh4mxewc",
+          "title": "YouTube Video"
+        },
+        {
+          "tag": "IFRAME",
+          "src": "https://www.youtube.com/embed/mZu3yL9nT_Q",
+          "title": "YouTube Video"
+        },
+        {
+          "tag": "IFRAME",
+          "src": "https://www.youtube.com/embed/q2151NSwLMA",
+          "title": "YouTube Video"
+        }
+      ],
+      "images": [
+        {
+          "alt": "",
+          "natural_width": 664,
+          "natural_height": 389,
+          "display_width": 656
+        }
+      ],
+      "inspection_note": "Three YouTube iframe embeds observed in the use-case article. Full video playback and app functionality were not evaluated."
+    },
+    {
+      "id": "excalidraw",
+      "url": "https://github.com/excalidraw/excalidraw-mcp",
+      "http": 200,
+      "title": "GitHub - excalidraw/excalidraw-mcp: Fast and streamable Excalidraw MCP App · GitHub",
+      "headings": [
+        "Excalidraw MCP App Server",
+        "Install",
+        "Remote (recommended)",
+        "https://mcp.excalidraw.com",
+        "Local",
+        "Usage",
+        "What are MCP Apps and how can I build one?",
+        "Contributing",
+        "Deploy your own instance",
+        "Release checklist",
+        "Credits",
+        "License"
+      ],
+      "video_elements": 0,
+      "embedded_players": [],
+      "images": [
+        {
+          "alt": "Demo",
+          "natural_width": 620,
+          "natural_height": 510,
+          "display_width": 0
+        },
+        {
+          "alt": "Demo",
+          "natural_width": 620,
+          "natural_height": 510,
+          "display_width": 0
+        }
+      ],
+      "inspection_note": "README references docs/demo.gif at 620x510 before Install. GitHub replaces animated images with its own player; no animation playback was evaluated."
+    },
+    {
+      "id": "deepstudy",
+      "url": "https://github.com/VihaanMotwani/deep-study-skills",
+      "http": 200,
+      "title": "GitHub - VihaanMotwani/deep-study-skills: Research-backed AI tutoring, study companionship, and teach-back for ChatGPT and Codex. · GitHub",
+      "headings": [
+        "Deep Study",
+        "What makes it different",
+        "Install the complete plugin",
+        "Whiteboard requirement",
+        "Install only one skill",
+        "Try it",
+        "Whiteboard examples",
+        "Research and evaluation",
+        "Repository layout",
+        "Development",
+        "License"
+      ],
+      "video_elements": 0,
+      "embedded_players": [],
+      "images": [
+        {
+          "alt": "Deep Study — Learn it. Recall it. Teach it back.",
+          "natural_width": 2171,
+          "natural_height": 724,
+          "display_width": 838
+        },
+        {
+          "alt": "Guided Tutor whiteboard",
+          "natural_width": 1580,
+          "natural_height": 795,
+          "display_width": 230.53125
+        },
+        {
+          "alt": "Study Companion recall map",
+          "natural_width": 1610,
+          "natural_height": 815,
+          "display_width": 266.890625
+        },
+        {
+          "alt": "Teach-Back Student model",
+          "natural_width": 1590,
+          "natural_height": 875,
+          "display_width": 258.578125
+        }
+      ],
+      "inspection_note": "Three whiteboard output images observed; these are example artifacts, not evidence of a native ChatGPT conversation."
+    },
+    {
+      "id": "ranedeer",
+      "url": "https://github.com/JushBJJ/Mr.-Ranedeer-AI-Tutor",
+      "http": 200,
+      "title": "GitHub - JushBJJ/Mr.-Ranedeer-AI-Tutor: A GPT-4 AI Tutor Prompt for customizable personalized learning experiences. · GitHub",
+      "headings": [
+        "DISCONTINUED",
+        "Mr. Ranedeer: Your personalized AI Tutor!",
+        "Table of Contents",
+        "Why Mr. Ranedeer?",
+        "Requirements and Compatibility",
+        "Recommended",
+        "Not Recommended",
+        "It also works on...",
+        "Quick Start Guide",
+        "Previous Versions",
+        "Guides",
+        "Mr. Ranedeer Personalization Options",
+        "Commands",
+        "Different Languages",
+        "Chinese",
+        "Disclaimer",
+        "Screenshot Examples (Lesson 1.1, No Ranedeer Tools, default configuration)",
+        "Lesson 1.1",
+        "How 1 + 1 = 2",
+        "Poetry Analysis",
+        "Partial Fractions",
+        "Python",
+        "The /test command",
+        "Partial Fractions",
+        "Python",
+        "Planning Lessons",
+        "Poetry Analysis",
+        "Partial Fractions - Main Curriculum"
+      ],
+      "video_elements": 0,
+      "embedded_players": [],
+      "images": [
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        },
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        },
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        },
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        },
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        },
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        },
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        },
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        },
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        },
+        {
+          "alt": "image",
+          "natural_width": 0,
+          "natural_height": 0,
+          "display_width": 65.84375
+        }
+      ],
+      "inspection_note": "README marked DISCONTINUED. External screenshot images did not load in this environment; no claim that they fail for every visitor."
+    },
+    {
+      "id": "lr-desktop",
+      "url": "https://github.com/aikuozone/lucid-reason",
+      "http": 200,
+      "title": "GitHub - aikuozone/lucid-reason: Systematic understanding, visual learning and iterative planning with AI. Skills-only plugin for ChatGPT, MIT licensed. · GitHub",
+      "headings": [
+        "A real ChatGPT conversation",
+        "Why use lr?",
+        "Discuss a plan and improve it together",
+        "Use it in ChatGPT Chat mode",
+        "Use the skill in Codex",
+        "Test and reproduce",
+        "Package and contribute"
+      ],
+      "video_elements": 0,
+      "embedded_players": [],
+      "images": [
+        {
+          "alt": "lucid-reason — systematic understanding, engineering reasoning and reliable problem solving for ChatGPT",
+          "natural_width": 1280,
+          "natural_height": 460,
+          "display_width": 838
+        },
+        {
+          "alt": "MIT license",
+          "natural_width": 78,
+          "natural_height": 20,
+          "display_width": 78
+        },
+        {
+          "alt": "Offline checks",
+          "natural_width": 155,
+          "natural_height": 20,
+          "display_width": 155
+        },
+        {
+          "alt": "Version 1.1.5",
+          "natural_width": 90,
+          "natural_height": 20,
+          "display_width": 90
+        },
+        {
+          "alt": "Real ChatGPT shared page: Transformer knowledge map and module relationships",
+          "natural_width": 1440,
+          "natural_height": 1100,
+          "display_width": 838
+        }
+      ],
+      "viewport_width": 1440,
+      "main_screenshot_scale": 0.5819
+    },
+    {
+      "id": "lr-mobile",
+      "url": "https://github.com/aikuozone/lucid-reason",
+      "http": 200,
+      "title": "GitHub - aikuozone/lucid-reason: Systematic understanding, visual learning and iterative planning with AI. Skills-only plugin for ChatGPT, MIT licensed. · GitHub",
+      "headings": [
+        "A real ChatGPT conversation",
+        "Why use lr?",
+        "Discuss a plan and improve it together",
+        "Use it in ChatGPT Chat mode",
+        "Use the skill in Codex",
+        "Test and reproduce",
+        "Package and contribute"
+      ],
+      "video_elements": 0,
+      "embedded_players": [],
+      "images": [
+        {
+          "alt": "lucid-reason — systematic understanding, engineering reasoning and reliable problem solving for ChatGPT",
+          "natural_width": 1280,
+          "natural_height": 460,
+          "display_width": 324
+        },
+        {
+          "alt": "MIT license",
+          "natural_width": 78,
+          "natural_height": 20,
+          "display_width": 78
+        },
+        {
+          "alt": "Offline checks",
+          "natural_width": 155,
+          "natural_height": 20,
+          "display_width": 155
+        },
+        {
+          "alt": "Version 1.1.5",
+          "natural_width": 90,
+          "natural_height": 20,
+          "display_width": 90
+        },
+        {
+          "alt": "Real ChatGPT shared page: Transformer knowledge map and module relationships",
+          "natural_width": 1440,
+          "natural_height": 1100,
+          "display_width": 324
+        }
+      ],
+      "viewport_width": 390,
+      "main_screenshot_scale": 0.225
+    }
+  ],
+  "additional_text_review": [
+    {
+      "url": "https://openai.com/business/plugins/mermaid-chart/",
+      "presentation": "Specific architecture-diagram prompt, how-it-works explanation, and three task-specific prompt/try entries.",
+      "method": "Primary page fetched with Exa; no installation or interaction test."
+    }
+  ]
+}
